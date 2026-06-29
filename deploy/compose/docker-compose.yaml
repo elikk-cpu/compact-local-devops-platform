@@ -1,4 +1,20 @@
 services:
+  frontend:
+    build:
+      context: ../../app/frontend
+      dockerfile: Dockerfile
+    image: localops-frontend:dev
+    container_name: localops-frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
   api:
     build:
       context: ../../app/api
