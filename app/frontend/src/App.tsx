@@ -202,6 +202,9 @@ type ApiPlatformStatus = {
     name: string;
     status: string;
     description: string;
+    latency: string;
+    uptime: string;
+    last_check: string;
   }[];
   active_incidents: {
     id: number;
@@ -258,9 +261,23 @@ function StatusPage() {
   const liveServices = services.map((service) => {
     const apiService = apiStatus?.services.find((item) => item.name === service.name);
 
+    const normalizedStatus: ServiceStatus["status"] =
+      apiService?.status === "operational"
+        ? "Operational"
+        : apiService?.status === "degraded"
+          ? "Degraded"
+          : apiService?.status === "down"
+            ? "Down"
+            : service.status;
+
     return {
       ...service,
-      status: apiService?.status === "operational" ? "Operational" : service.status,
+      status: normalizedStatus,
+      latency: apiService?.latency ?? service.latency,
+      uptime: apiService?.uptime ?? service.uptime,
+      lastCheck: apiService?.last_check
+        ? new Date(apiService.last_check).toUTCString().replace("GMT", "UTC")
+        : service.lastCheck,
     } satisfies ServiceStatus;
   });
 
