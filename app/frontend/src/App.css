@@ -2500,3 +2500,47 @@ a {
     drop-shadow(0 0 18px rgba(34, 211, 238, 0.28)) drop-shadow(0 0 42px rgba(168, 85, 247, 0.34));
   pointer-events: none;
 }
+.api-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(15, 23, 42, 0.58);
+  font-size: 12px;
+}
+
+.api-live-badge>span {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+}
+
+.api-live-badge.connected {
+  color: var(--green);
+  border-color: rgba(44, 255, 154, 0.28);
+}
+
+.api-live-badge.connected>span {
+  background: var(--green);
+  box-shadow: 0 0 12px var(--green);
+}
+
+.api-live-badge.checking {
+  color: var(--yellow);
+}
+
+.api-live-badge.checking>span {
+  background: var(--yellow);
+}
+
+.api-live-badge.down {
+  color: #fb3b71;
+  border-color: rgba(251, 59, 113, 0.32);
+}
+
+.api-live-badge.down>span {
+  background: #fb3b71;
+  box-shadow: 0 0 12px rgba(251, 59, 113, 0.85);
+}

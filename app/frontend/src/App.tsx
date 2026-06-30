@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -193,6 +193,31 @@ const logEvents = [
   ["10:24:22 PM", "INFO", "Worker", "Processed job job=send-email id=8f3c"],
 ];
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://192.168.57.10:8000";
+
+
+function ApiLiveBadge() {
+  const [status, setStatus] = useState<"checking" | "connected" | "down">("checking");
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/health`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("API is not healthy");
+        }
+        setStatus("connected");
+      })
+      .catch(() => setStatus("down"));
+  }, []);
+
+  return (
+    <span className={`api-live-badge ${status}`}>
+      <span />
+      API {status === "connected" ? "connected" : status === "down" ? "offline" : "checking"}
+    </span>
+  );
+}
+
 function App() {
   const isAdmin = window.location.pathname.startsWith("/admin");
   return isAdmin ? <AdminDashboard /> : <StatusPage />;
@@ -268,6 +293,7 @@ function StatusPage() {
             </span>
             <span className="meta-divider" />
             <span>Last updated: May 22, 2025 10:24:30 PM UTC</span>
+            <ApiLiveBadge />
           </div>
         </div>
 

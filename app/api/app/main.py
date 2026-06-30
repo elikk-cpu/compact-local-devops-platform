@@ -4,12 +4,23 @@ from typing import List
 from fastapi import FastAPI, Response
 from pydantic import BaseModel
 from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST
-
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title="LocalOps Status Platform API",
     version="0.1.0",
     description="Backend API for LocalOps Status Platform",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://192.168.57.10:5173",
+        "http://localhost:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 REQUEST_COUNTER = Counter(
