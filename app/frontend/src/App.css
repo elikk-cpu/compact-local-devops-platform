@@ -1361,3 +1361,1142 @@ a {
     grid-template-columns: repeat(2, 1fr);
   }
 }
+/* =========================
+   Hero visual upgrade
+========================= */
+
+.hero {
+  grid-template-columns: 520px 1fr;
+  min-height: 330px;
+  padding: 44px 58px;
+}
+
+.hero-visual {
+  position: relative;
+  z-index: 2;
+  height: 260px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+}
+
+.hologram-shield {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 230px;
+  height: 230px;
+  color: var(--green);
+  filter:
+    drop-shadow(0 0 22px rgba(44, 255, 154, 0.9)) drop-shadow(0 0 58px rgba(44, 255, 154, 0.35));
+}
+
+.shield-glow {
+  position: absolute;
+  width: 170px;
+  height: 170px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(44, 255, 154, 0.34), transparent 68%);
+  animation: shieldFloat 3.8s ease-in-out infinite;
+}
+
+.holo-ring {
+  position: absolute;
+  border: 1px solid rgba(44, 255, 154, 0.42);
+  border-radius: 50%;
+  transform: rotateX(68deg);
+  box-shadow:
+    0 0 18px rgba(44, 255, 154, 0.45),
+    inset 0 0 18px rgba(44, 255, 154, 0.18);
+}
+
+.ring-one {
+  bottom: 24px;
+  width: 210px;
+  height: 70px;
+  animation: ringPulse 2.4s ease-in-out infinite;
+}
+
+.ring-two {
+  bottom: 8px;
+  width: 280px;
+  height: 88px;
+  opacity: 0.72;
+  animation: ringPulse 3s ease-in-out infinite;
+}
+
+.ring-three {
+  bottom: -8px;
+  width: 360px;
+  height: 108px;
+  opacity: 0.38;
+  animation: ringPulse 3.6s ease-in-out infinite;
+}
+
+.neon-skyline {
+  position: absolute;
+  bottom: 24px;
+  display: flex;
+  align-items: end;
+  gap: 14px;
+  height: 160px;
+  opacity: 0.86;
+}
+
+.skyline-left {
+  left: 8px;
+}
+
+.skyline-right {
+  right: 8px;
+}
+
+.neon-skyline span {
+  display: block;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to top, transparent, #7c3aed, #22d3ee);
+  box-shadow:
+    0 0 14px rgba(34, 211, 238, 0.9),
+    0 0 34px rgba(168, 85, 247, 0.6);
+  animation: skylinePulse 2.2s ease-in-out infinite alternate;
+}
+
+.neon-skyline span:nth-child(1) {
+  height: 42px;
+}
+
+.neon-skyline span:nth-child(2) {
+  height: 92px;
+  animation-delay: 0.2s;
+}
+
+.neon-skyline span:nth-child(3) {
+  height: 58px;
+  animation-delay: 0.4s;
+}
+
+.neon-skyline span:nth-child(4) {
+  height: 128px;
+  animation-delay: 0.6s;
+}
+
+.neon-skyline span:nth-child(5) {
+  height: 72px;
+  animation-delay: 0.8s;
+}
+
+.neon-skyline span:nth-child(6) {
+  height: 112px;
+  animation-delay: 1s;
+}
+
+.neon-skyline span:nth-child(7) {
+  height: 46px;
+  animation-delay: 1.2s;
+}
+
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  height: 1px;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(34, 211, 238, 0.35),
+      rgba(168, 85, 247, 0.5),
+      rgba(44, 255, 154, 0.35),
+      transparent);
+  box-shadow:
+    0 0 18px rgba(34, 211, 238, 0.45),
+    0 0 46px rgba(168, 85, 247, 0.28);
+}
+
+@keyframes skylinePulse {
+  from {
+    opacity: 0.35;
+    transform: scaleY(0.82);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    transform: rotateX(68deg) scale(0.92);
+    opacity: 0.35;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: rotateX(68deg) scale(1.08);
+    opacity: 0.35;
+  }
+}
+
+@keyframes shieldFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+/* =========================
+   Hero right telemetry upgrade
+========================= */
+
+.hero {
+  grid-template-columns: 430px minmax(560px, 1fr) 420px;
+  gap: 36px;
+}
+
+.hero-copy {
+  align-self: center;
+}
+
+.hero-side-panel {
+  position: relative;
+  z-index: 2;
+  height: 260px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.12), transparent 44%),
+    radial-gradient(circle at 70% 25%, rgba(168, 85, 247, 0.22), transparent 34%);
+}
+
+.side-skyline {
+  position: absolute;
+  inset: auto 0 28px;
+  display: flex;
+  justify-content: center;
+  align-items: end;
+  gap: 16px;
+  height: 190px;
+  opacity: 0.9;
+}
+
+.side-skyline span {
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to top, transparent, #7c3aed, #22d3ee, #ffffff);
+  box-shadow:
+    0 0 16px rgba(34, 211, 238, 0.95),
+    0 0 44px rgba(168, 85, 247, 0.7);
+  animation: skylinePulse 2.4s ease-in-out infinite alternate;
+}
+
+.side-skyline span:nth-child(1) {
+  height: 38px;
+  animation-delay: 0s;
+}
+
+.side-skyline span:nth-child(2) {
+  height: 82px;
+  animation-delay: .15s;
+}
+
+.side-skyline span:nth-child(3) {
+  height: 54px;
+  animation-delay: .3s;
+}
+
+.side-skyline span:nth-child(4) {
+  height: 148px;
+  animation-delay: .45s;
+}
+
+.side-skyline span:nth-child(5) {
+  height: 92px;
+  animation-delay: .6s;
+}
+
+.side-skyline span:nth-child(6) {
+  height: 178px;
+  animation-delay: .75s;
+}
+
+.side-skyline span:nth-child(7) {
+  height: 74px;
+  animation-delay: .9s;
+}
+
+.side-skyline span:nth-child(8) {
+  height: 124px;
+  animation-delay: 1.05s;
+}
+
+.side-skyline span:nth-child(9) {
+  height: 48px;
+  animation-delay: 1.2s;
+}
+
+.telemetry-orb {
+  position: absolute;
+  top: 44px;
+  right: 52px;
+  display: grid;
+  place-items: center;
+  width: 112px;
+  height: 112px;
+  color: var(--cyan);
+  border: 1px solid rgba(34, 211, 238, 0.32);
+  border-radius: 999px;
+  background: rgba(2, 6, 23, 0.48);
+  box-shadow:
+    0 0 24px rgba(34, 211, 238, 0.3),
+    inset 0 0 24px rgba(34, 211, 238, 0.08);
+}
+
+.orb-ring {
+  position: absolute;
+  border: 1px solid rgba(168, 85, 247, 0.45);
+  border-radius: 999px;
+  animation: telemetrySpin 8s linear infinite;
+}
+
+.orb-ring-one {
+  width: 142px;
+  height: 58px;
+  transform: rotateX(68deg) rotateZ(18deg);
+}
+
+.orb-ring-two {
+  width: 158px;
+  height: 66px;
+  transform: rotateX(68deg) rotateZ(-28deg);
+  animation-duration: 11s;
+}
+
+.telemetry-stack {
+  position: absolute;
+  left: 18px;
+  bottom: 20px;
+  display: grid;
+  gap: 10px;
+  width: 250px;
+}
+
+.telemetry-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid rgba(34, 211, 238, 0.24);
+  border-radius: 16px;
+  background: rgba(3, 8, 22, 0.62);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 0 22px rgba(34, 211, 238, 0.08);
+}
+
+.telemetry-card svg {
+  color: var(--cyan);
+}
+
+.telemetry-card.purple {
+  border-color: rgba(168, 85, 247, 0.3);
+}
+
+.telemetry-card.purple svg {
+  color: var(--purple);
+}
+
+.telemetry-card.green {
+  border-color: rgba(44, 255, 154, 0.28);
+}
+
+.telemetry-card.green svg {
+  color: var(--green);
+}
+
+.telemetry-card span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.telemetry-card strong {
+  display: block;
+  margin-top: 4px;
+  color: #e5f7ff;
+  font-size: 13px;
+}
+
+@keyframes telemetrySpin {
+  from {
+    rotate: 0deg;
+  }
+
+  to {
+    rotate: 360deg;
+  }
+}
+
+@media (max-width: 1700px) {
+  .hero {
+    grid-template-columns: 360px 1fr;
+  }
+
+  .hero-side-panel {
+    display: none;
+  }
+}
+/* FINAL HERO LIKE REFERENCE */
+
+.hero.hero-ref-clean {
+  display: grid;
+  grid-template-columns: 360px minmax(620px, 0.95fr) 1fr;
+  align-items: center;
+  gap: 34px;
+  min-height: 330px;
+  padding: 42px 60px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 13% 58%, rgba(44, 255, 154, 0.17), transparent 27%),
+    radial-gradient(circle at 82% 58%, rgba(124, 58, 237, 0.24), transparent 34%),
+    linear-gradient(90deg, rgba(2, 12, 23, 0.96), rgba(5, 14, 29, 0.96) 44%, rgba(13, 10, 38, 0.95));
+}
+
+.hero.hero-ref-clean::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(34, 211, 238, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+  background-size: 42px 42px;
+  opacity: 0.62;
+}
+
+.hero.hero-ref-clean::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 38px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.28), rgba(168, 85, 247, 0.55), transparent);
+  box-shadow: 0 0 24px rgba(34, 211, 238, 0.45), 0 0 70px rgba(168, 85, 247, 0.35);
+}
+
+.hero-left-scene,
+.hero-copy-center,
+.hero-right-scene {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-left-scene {
+  height: 250px;
+  display: grid;
+  place-items: center;
+}
+
+.big-shield {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 230px;
+  height: 230px;
+  color: var(--green);
+  filter:
+    drop-shadow(0 0 18px rgba(44, 255, 154, 0.95)) drop-shadow(0 0 54px rgba(44, 255, 154, 0.45));
+  animation: refFloat 4s ease-in-out infinite;
+}
+
+.shield-aura {
+  position: absolute;
+  width: 185px;
+  height: 185px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(44, 255, 154, 0.36), transparent 68%);
+}
+
+.shield-ring {
+  position: absolute;
+  border: 1px solid rgba(44, 255, 154, 0.5);
+  border-radius: 50%;
+  transform: rotateX(70deg);
+  box-shadow: 0 0 18px rgba(44, 255, 154, 0.55);
+}
+
+.ring-a {
+  bottom: 32px;
+  width: 190px;
+  height: 58px;
+  animation: refRing 2.4s ease-in-out infinite;
+}
+
+.ring-b {
+  bottom: 17px;
+  width: 260px;
+  height: 76px;
+  opacity: 0.7;
+  animation: refRing 3s ease-in-out infinite;
+}
+
+.ring-c {
+  bottom: 2px;
+  width: 340px;
+  height: 98px;
+  opacity: 0.35;
+  animation: refRing 3.5s ease-in-out infinite;
+}
+
+.hero-copy-center h1 {
+  margin: 0;
+  color: var(--green);
+  font-size: clamp(54px, 5.4vw, 82px);
+  line-height: 0.96;
+  letter-spacing: -0.085em;
+  text-shadow: 0 0 18px rgba(44, 255, 154, 0.78), 0 0 52px rgba(44, 255, 154, 0.35);
+}
+
+.hero-copy-center p {
+  max-width: 760px;
+  margin: 18px 0 0;
+  color: #d5e5f2;
+  font-size: 20px;
+  line-height: 1.55;
+}
+
+.hero-meta-clean {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+  color: #90a4b8;
+}
+
+.meta-divider {
+  width: 1px;
+  height: 16px;
+  background: rgba(148, 163, 184, 0.34);
+}
+
+.hero-right-scene {
+  height: 250px;
+  overflow: hidden;
+}
+
+.scene-floor {
+  position: absolute;
+  left: -50px;
+  right: -80px;
+  bottom: 16px;
+  height: 150px;
+  background:
+    linear-gradient(rgba(34, 211, 238, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.1) 1px, transparent 1px);
+  background-size: 44px 26px;
+  transform: perspective(480px) rotateX(66deg);
+  transform-origin: bottom;
+  opacity: 0.5;
+  mask-image: radial-gradient(circle at center, black, transparent 72%);
+}
+
+.scene-bars {
+  position: absolute;
+  bottom: 42px;
+  display: flex;
+  align-items: end;
+  gap: 15px;
+}
+
+.left-bars {
+  left: 10px;
+  right: 8px;
+  justify-content: space-between;
+}
+
+.right-bars {
+  left: 20px;
+  right: 20px;
+  justify-content: center;
+}
+
+.scene-bars span {
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to top, transparent, #2563eb, #7c3aed, #22d3ee);
+  box-shadow: 0 0 14px rgba(34, 211, 238, 0.95), 0 0 40px rgba(124, 58, 237, 0.76);
+  animation: refBars 2.4s ease-in-out infinite alternate;
+}
+
+.scene-bars span:nth-child(1) {
+  height: 38px;
+  animation-delay: 0s;
+}
+
+.scene-bars span:nth-child(2) {
+  height: 72px;
+  animation-delay: .12s;
+}
+
+.scene-bars span:nth-child(3) {
+  height: 118px;
+  animation-delay: .24s;
+}
+
+.scene-bars span:nth-child(4) {
+  height: 64px;
+  animation-delay: .36s;
+}
+
+.scene-bars span:nth-child(5) {
+  height: 156px;
+  animation-delay: .48s;
+}
+
+.scene-bars span:nth-child(6) {
+  height: 96px;
+  animation-delay: .6s;
+}
+
+.scene-bars span:nth-child(7) {
+  height: 180px;
+  animation-delay: .72s;
+}
+
+.scene-bars span:nth-child(8) {
+  height: 88px;
+  animation-delay: .84s;
+}
+
+.scene-bars span:nth-child(9) {
+  height: 132px;
+  animation-delay: .96s;
+}
+
+.scene-bars span:nth-child(10) {
+  height: 66px;
+  animation-delay: 1.08s;
+}
+
+.beam {
+  position: absolute;
+  bottom: 36px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to top, rgba(168, 85, 247, 0.1), #a855f7, #22d3ee);
+  box-shadow: 0 0 22px rgba(168, 85, 247, 0.95), 0 0 80px rgba(34, 211, 238, 0.45);
+}
+
+.beam-main {
+  right: 170px;
+  height: 210px;
+}
+
+.beam-small {
+  right: 92px;
+  height: 126px;
+  opacity: 0.65;
+}
+
+@keyframes refBars {
+  from {
+    opacity: 0.35;
+    transform: scaleY(0.76);
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@keyframes refRing {
+  0% {
+    transform: rotateX(70deg) scale(0.92);
+    opacity: 0.32;
+  }
+
+  50% {
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: rotateX(70deg) scale(1.08);
+    opacity: 0.32;
+  }
+}
+
+@keyframes refFloat {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-8px);
+  }
+}
+/* RIGHT SIDE CLEANUP */
+
+.hero.hero-ref-clean .right-bars,
+.hero.hero-ref-clean .beam,
+.hero.hero-ref-clean .scene-floor {
+  display: none;
+}
+
+.hero.hero-ref-clean .hero-right-scene {
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+}
+
+.hero.hero-ref-clean .hero-right-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 78% 55%, rgba(168, 85, 247, 0.55), transparent 16%),
+    radial-gradient(circle at 72% 58%, rgba(34, 211, 238, 0.25), transparent 20%),
+    linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.18));
+}
+
+.hero.hero-ref-clean .hero-right-scene::after {
+  content: "";
+  position: absolute;
+  right: 70px;
+  bottom: 50px;
+  width: 520px;
+  height: 170px;
+  background:
+    linear-gradient(rgba(34, 211, 238, 0.16) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.14) 1px, transparent 1px);
+  background-size: 42px 24px;
+  transform: perspective(500px) rotateX(68deg);
+  transform-origin: bottom;
+  opacity: 0.75;
+  mask-image: radial-gradient(circle at 65% 50%, black, transparent 72%);
+  box-shadow: 0 0 60px rgba(168, 85, 247, 0.25);
+}
+/* RIGHT HERO — CYBERPUNK SKYLINE FINAL */
+
+.hero.hero-ref-clean .hero-right-scene {
+  display: block;
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 72% 62%, rgba(168, 85, 247, 0.42), transparent 24%),
+    radial-gradient(circle at 54% 58%, rgba(34, 211, 238, 0.18), transparent 24%),
+    linear-gradient(90deg, rgba(2, 6, 23, 0), rgba(15, 23, 42, 0.22), rgba(30, 13, 70, 0.34));
+}
+
+/* атмосферная дымка + частицы */
+.hero.hero-ref-clean .hero-right-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 72% 42%, rgba(255, 255, 255, 0.85) 0 1px, transparent 2px),
+    radial-gradient(circle at 58% 25%, rgba(34, 211, 238, 0.9) 0 1px, transparent 2px),
+    radial-gradient(circle at 86% 34%, rgba(168, 85, 247, 0.9) 0 1px, transparent 2px),
+    radial-gradient(circle at 66% 66%, rgba(56, 189, 248, 0.75) 0 1px, transparent 2px),
+    linear-gradient(to bottom, transparent 0%, rgba(2, 6, 23, 0.15) 62%, rgba(2, 6, 23, 0.72) 100%);
+  opacity: 0.8;
+}
+
+/* яркий горизонт */
+.hero.hero-ref-clean .hero-right-scene::after {
+  content: "";
+  position: absolute;
+  left: 5%;
+  right: 0;
+  bottom: 54px;
+  height: 2px;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(34, 211, 238, 0.18),
+      rgba(34, 211, 238, 0.7),
+      rgba(168, 85, 247, 0.95),
+      rgba(244, 114, 182, 0.72),
+      transparent);
+  box-shadow:
+    0 0 18px rgba(34, 211, 238, 0.55),
+    0 0 42px rgba(168, 85, 247, 0.75),
+    0 0 90px rgba(168, 85, 247, 0.42);
+}
+
+/* перспективная сетка пола */
+.hero.hero-ref-clean .scene-floor {
+  display: block;
+  position: absolute;
+  left: -90px;
+  right: -90px;
+  bottom: -8px;
+  height: 190px;
+  background:
+    linear-gradient(rgba(124, 58, 237, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.28) 1px, transparent 1px);
+  background-size: 56px 28px;
+  transform: perspective(520px) rotateX(68deg);
+  transform-origin: bottom;
+  opacity: 0.72;
+  mask-image: linear-gradient(to top, black 0%, black 48%, transparent 86%);
+  box-shadow:
+    0 0 36px rgba(124, 58, 237, 0.3),
+    0 0 80px rgba(34, 211, 238, 0.18);
+}
+
+/* skyline справа */
+.hero.hero-ref-clean .right-bars {
+  display: flex;
+  position: absolute;
+  right: 38px;
+  bottom: 56px;
+  left: auto;
+  width: 520px;
+  height: 190px;
+  justify-content: flex-end;
+  align-items: end;
+  gap: 18px;
+}
+
+.hero.hero-ref-clean .right-bars span {
+  display: block;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(to top,
+      transparent 0%,
+      rgba(37, 99, 235, 0.45) 18%,
+      #2563eb 42%,
+      #7c3aed 68%,
+      #22d3ee 100%);
+  box-shadow:
+    0 0 12px rgba(34, 211, 238, 0.95),
+    0 0 34px rgba(124, 58, 237, 0.85),
+    0 0 72px rgba(168, 85, 247, 0.42);
+  animation: refBars 2.8s ease-in-out infinite alternate;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(1) {
+  height: 44px;
+  opacity: 0.35;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(2) {
+  height: 72px;
+  opacity: 0.5;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(3) {
+  height: 118px;
+  opacity: 0.7;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(4) {
+  height: 82px;
+  opacity: 0.58;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(5) {
+  height: 156px;
+  opacity: 0.88;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(6) {
+  height: 96px;
+  opacity: 0.66;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(7) {
+  height: 210px;
+  opacity: 1;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(8) {
+  height: 78px;
+  opacity: 0.58;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(9) {
+  height: 138px;
+  opacity: 0.82;
+}
+
+.hero.hero-ref-clean .right-bars span:nth-child(10) {
+  height: 54px;
+  opacity: 0.45;
+}
+
+/* главные световые башни */
+.hero.hero-ref-clean .beam {
+  display: block;
+  position: absolute;
+  bottom: 52px;
+  width: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to top, transparent, #a855f7 34%, #22d3ee 100%);
+}
+
+.hero.hero-ref-clean .beam-main {
+  right: 190px;
+  height: 230px;
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 1),
+    0 0 70px rgba(168, 85, 247, 0.85),
+    0 0 140px rgba(34, 211, 238, 0.35);
+}
+
+.hero.hero-ref-clean .beam-small {
+  right: 90px;
+  height: 132px;
+  opacity: 0.72;
+  box-shadow:
+    0 0 16px rgba(34, 211, 238, 0.9),
+    0 0 52px rgba(168, 85, 247, 0.58);
+}
+
+/* свечение у основания главной башни */
+.hero.hero-ref-clean .beam-main::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  width: 220px;
+  height: 58px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.85), rgba(34, 211, 238, 0.2), transparent 70%);
+  filter: blur(4px);
+}
+
+/* затемнение между текстом и skyline, чтобы не было каши */
+.hero.hero-ref-clean .hero-right-scene {
+  mask-image: linear-gradient(90deg, transparent 0%, black 20%, black 100%);
+}
+/* RIGHT HERO — CLEAN WIDE SKYLINE FIX */
+
+.hero.hero-ref-clean .right-bars,
+.hero.hero-ref-clean .beam,
+.hero.hero-ref-clean .scene-floor {
+  display: none !important;
+}
+
+.hero.hero-ref-clean .hero-right-scene {
+  display: block;
+  position: relative;
+  height: 250px;
+  overflow: hidden;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 72% 55%, rgba(124, 58, 237, 0.34), transparent 26%),
+    radial-gradient(circle at 58% 58%, rgba(34, 211, 238, 0.16), transparent 24%),
+    linear-gradient(90deg, transparent 0%, rgba(15, 23, 42, 0.16) 36%, rgba(36, 14, 78, 0.28) 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, black 18%, black 100%);
+}
+
+/* пол-сетка, как на референсе */
+.hero.hero-ref-clean .hero-right-scene::before {
+  content: "";
+  position: absolute;
+  left: -60px;
+  right: -40px;
+  bottom: -18px;
+  height: 155px;
+  background:
+    linear-gradient(rgba(124, 58, 237, 0.28) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 58, 237, 0.22) 1px, transparent 1px);
+  background-size: 58px 28px;
+  transform: perspective(520px) rotateX(68deg);
+  transform-origin: bottom;
+  opacity: 0.68;
+  mask-image: linear-gradient(to top, black 0%, black 45%, transparent 88%);
+}
+
+/* сам skyline: не палки, а силуэт города + лучи */
+.hero.hero-ref-clean .hero-right-scene::after {
+  content: "";
+  position: absolute;
+  right: 4%;
+  bottom: 54px;
+  width: 66%;
+  height: 175px;
+  background:
+    linear-gradient(to top, rgba(124, 58, 237, 0.92), rgba(34, 211, 238, 0.78), transparent 74%) 8% 100% / 3px 76px no-repeat,
+    linear-gradient(to top, rgba(34, 211, 238, 0.95), rgba(168, 85, 247, 0.82), transparent 82%) 18% 100% / 3px 126px no-repeat,
+    linear-gradient(to top, rgba(37, 99, 235, 0.72), rgba(124, 58, 237, 0.72), transparent 80%) 27% 100% / 18px 62px no-repeat,
+    linear-gradient(to top, rgba(37, 99, 235, 0.62), rgba(34, 211, 238, 0.72), transparent 80%) 35% 100% / 26px 98px no-repeat,
+    linear-gradient(to top, rgba(168, 85, 247, 0.95), rgba(34, 211, 238, 0.85), transparent 86%) 45% 100% / 4px 168px no-repeat,
+    linear-gradient(to top, rgba(37, 99, 235, 0.62), rgba(124, 58, 237, 0.7), transparent 80%) 54% 100% / 34px 88px no-repeat,
+    linear-gradient(to top, rgba(124, 58, 237, 0.76), rgba(244, 114, 182, 0.72), transparent 82%) 66% 100% / 24px 118px no-repeat,
+    linear-gradient(to top, rgba(168, 85, 247, 1), rgba(34, 211, 238, 0.9), transparent 88%) 76% 100% / 4px 205px no-repeat,
+    linear-gradient(to top, rgba(37, 99, 235, 0.58), rgba(124, 58, 237, 0.7), transparent 78%) 84% 100% / 28px 92px no-repeat,
+    linear-gradient(to top, rgba(168, 85, 247, 0.92), rgba(34, 211, 238, 0.8), transparent 84%) 94% 100% / 3px 135px no-repeat;
+  opacity: 0.84;
+  filter:
+    drop-shadow(0 0 12px rgba(34, 211, 238, 0.72)) drop-shadow(0 0 34px rgba(168, 85, 247, 0.55));
+}
+
+/* горизонтальное свечение */
+.hero.hero-ref-clean {
+  background:
+    radial-gradient(circle at 13% 58%, rgba(44, 255, 154, 0.17), transparent 27%),
+    radial-gradient(circle at 76% 62%, rgba(168, 85, 247, 0.24), transparent 35%),
+    linear-gradient(90deg, rgba(2, 12, 23, 0.96), rgba(5, 14, 29, 0.96) 44%, rgba(13, 10, 38, 0.95));
+}
+
+.hero.hero-ref-clean .hero-right-scene .city-glow {
+  display: none;
+}
+/* HERO RIGHT SIDE — SVG SKYLINE FINAL */
+
+/* выключаем старые CSS-палки и лучи */
+.hero.hero-ref-clean .right-bars,
+.hero.hero-ref-clean .beam,
+.hero.hero-ref-clean .scene-floor {
+  display: none !important;
+}
+
+/* делаем правую часть фоном из SVG */
+.hero.hero-ref-clean .hero-right-scene {
+  display: block !important;
+  position: absolute !important;
+  z-index: 2 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 48% !important;
+  height: auto !important;
+  overflow: hidden !important;
+  border-radius: 0 32px 32px 0 !important;
+  background-image:
+    linear-gradient(90deg, rgba(2, 12, 23, 0), rgba(2, 12, 23, 0.12) 18%, rgba(2, 12, 23, 0) 42%),
+    url("./assets/hero-skyline.svg") !important;
+  background-repeat: no-repeat !important;
+  background-position: center right !important;
+  background-size: cover !important;
+  mask-image: linear-gradient(90deg, transparent 0%, black 15%, black 100%) !important;
+}
+
+/* убираем старые псевдо-элементы, чтобы не конфликтовали */
+.hero.hero-ref-clean .hero-right-scene::before,
+.hero.hero-ref-clean .hero-right-scene::after {
+  display: none !important;
+}
+
+/* поверх всего hero добавляем мягкий общий переход, чтобы не было резкой границы */
+.hero.hero-ref-clean {
+  background:
+    radial-gradient(circle at 11% 58%, rgba(44, 255, 154, 0.19), transparent 26%),
+    radial-gradient(circle at 77% 62%, rgba(124, 58, 237, 0.24), transparent 36%),
+    linear-gradient(90deg, #020c17 0%, #05101f 43%, #09071c 100%) !important;
+}
+/* RIGHT SKYLINE SIZE FIX */
+
+.hero.hero-ref-clean .right-bars,
+.hero.hero-ref-clean .beam,
+.hero.hero-ref-clean .scene-floor {
+  display: none !important;
+}
+
+.hero.hero-ref-clean .hero-right-scene {
+  position: absolute !important;
+  z-index: 2 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 48% !important;
+  height: auto !important;
+  overflow: hidden !important;
+  border-radius: 0 32px 32px 0 !important;
+  background:
+    radial-gradient(circle at 78% 58%, rgba(168, 85, 247, 0.28), transparent 28%),
+    linear-gradient(90deg, transparent, rgba(30, 13, 70, 0.22)) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, black 16%, black 100%) !important;
+}
+
+.hero.hero-ref-clean .hero-right-scene::before {
+  content: "" !important;
+  position: absolute !important;
+  left: 8% !important;
+  right: 0 !important;
+  bottom: 38px !important;
+  height: 1px !important;
+  background: linear-gradient(90deg,
+      transparent,
+      rgba(34, 211, 238, 0.3),
+      rgba(168, 85, 247, 0.75),
+      transparent) !important;
+  box-shadow:
+    0 0 22px rgba(34, 211, 238, 0.45),
+    0 0 58px rgba(168, 85, 247, 0.55) !important;
+}
+
+.hero.hero-ref-clean .hero-right-scene::after {
+  content: "" !important;
+  position: absolute !important;
+  right: 42px !important;
+  bottom: 0 !important;
+  width: 70% !important;
+  height: 185px !important;
+  background-image: url("./assets/hero-skyline.svg") !important;
+  background-repeat: no-repeat !important;
+  background-position: right bottom !important;
+  background-size: contain !important;
+  opacity: 0.88 !important;
+  filter:
+    drop-shadow(0 0 20px rgba(34, 211, 238, 0.22)) drop-shadow(0 0 42px rgba(168, 85, 247, 0.28)) !important;
+}
+/* SVG skyline stable fix */
+
+.hero.hero-ref-clean .hero-right-scene {
+  display: block !important;
+  position: absolute !important;
+  z-index: 2 !important;
+  top: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  left: 48% !important;
+  height: auto !important;
+  overflow: hidden !important;
+  border-radius: 0 32px 32px 0 !important;
+  background:
+    radial-gradient(circle at 76% 60%, rgba(168, 85, 247, 0.26), transparent 34%),
+    linear-gradient(90deg, transparent, rgba(30, 13, 70, 0.2)) !important;
+  mask-image: linear-gradient(90deg, transparent 0%, black 12%, black 100%) !important;
+}
+
+.hero.hero-ref-clean .hero-right-scene::before,
+.hero.hero-ref-clean .hero-right-scene::after,
+.hero.hero-ref-clean .right-bars,
+.hero.hero-ref-clean .beam,
+.hero.hero-ref-clean .scene-floor {
+  display: none !important;
+  content: none !important;
+}
+
+.hero-skyline-img {
+  position: absolute;
+  right: -18px;
+  bottom: 0;
+  width: 82%;
+  height: auto;
+  max-height: 245px;
+  opacity: 0.92;
+  filter:
+    drop-shadow(0 0 18px rgba(34, 211, 238, 0.28)) drop-shadow(0 0 42px rgba(168, 85, 247, 0.34));
+  pointer-events: none;
+}

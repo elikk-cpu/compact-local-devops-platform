@@ -40,7 +40,7 @@ import {
   YAxis,
 } from "recharts";
 import "./App.css";
-
+import heroSkyline from "./assets/hero-skyline.svg";
 type ServiceStatus = {
   name: string;
   icon: LucideIcon;
@@ -226,23 +226,27 @@ function StatusPage() {
         </button>
       </header>
 
-      <section className="hero">
-        <motion.div
-          className="hero-badge"
-          initial={{ scale: 0.92, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.55 }}
-        >
-          <ShieldCheck size={82} />
-          <div className="pulse-ring" />
-        </motion.div>
-
-        <div className="hero-copy">
-          <div className="system-pill">
-            <span className="status-dot" />
-            All Systems Operational
+      <section className="hero hero-ref-clean">
+        <div className="hero-left-scene">
+          <div className="scene-bars left-bars">
+            <span /><span /><span /><span /><span /><span /><span /><span />
           </div>
 
+          <motion.div
+            className="big-shield"
+            initial={{ scale: 0.94, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 0.7 }}
+          >
+            <div className="shield-aura" />
+            <ShieldCheck size={132} strokeWidth={1.8} />
+            <div className="shield-ring ring-a" />
+            <div className="shield-ring ring-b" />
+            <div className="shield-ring ring-c" />
+          </motion.div>
+        </div>
+
+        <div className="hero-copy hero-copy-center">
           <motion.h1
             initial={{ y: 18, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
@@ -252,17 +256,23 @@ function StatusPage() {
           </motion.h1>
 
           <p>
-            LocalOps platform is healthy and operating normally. Real-time
-            status and performance for all systems and services.
+            LocalOps platform is healthy and operating normally.
+            <br />
+            Real-time status and performance for all systems and services.
           </p>
 
-          <div className="hero-meta">
+          <div className="hero-meta hero-meta-clean">
             <span>
               <Clock3 size={15} />
               Page auto-refreshes every 30s
             </span>
+            <span className="meta-divider" />
             <span>Last updated: May 22, 2025 10:24:30 PM UTC</span>
           </div>
+        </div>
+
+        <div className="hero-right-scene">
+          <img className="hero-skyline-img" src={heroSkyline} alt="" />
         </div>
       </section>
 
