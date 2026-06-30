@@ -195,6 +195,23 @@ const logEvents = [
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://192.168.57.10:8000";
 
+type ApiPlatformStatus = {
+  overall_status: string;
+  generated_at: string;
+  services: {
+    name: string;
+    status: string;
+    description: string;
+  }[];
+  active_incidents: {
+    id: number;
+    title: string;
+    status: string;
+    severity: string;
+    created_at: string;
+    updated_at: string;
+  }[];
+};
 
 function ApiLiveBadge() {
   const [status, setStatus] = useState<"checking" | "connected" | "down">("checking");
@@ -224,6 +241,34 @@ function App() {
 }
 
 function StatusPage() {
+  const [apiStatus, setApiStatus] = useState<ApiPlatformStatus | null>(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/api/status`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to load platform status");
+        }
+        return response.json();
+      })
+      .then((data: ApiPlatformStatus) => setApiStatus(data))
+      .catch(() => setApiStatus(null));
+  }, []);
+
+  const liveServices = services.map((service) => {
+    const apiService = apiStatus?.services.find((item) => item.name === service.name);
+
+    return {
+      ...service,
+      status: apiService?.status === "operational" ? "Operational" : service.status,
+    } satisfies ServiceStatus;
+  });
+
+  const activeIncidentsCount = apiStatus?.active_incidents.length ?? 0;
+
+  const lastUpdated = apiStatus?.generated_at
+    ? new Date(apiStatus.generated_at).toUTCString()
+    : "May 22, 2025 10:24:30 PM UTC";
   return (
     <main className="app-shell">
       <BackgroundEffects />
@@ -292,7 +337,7 @@ function StatusPage() {
               Page auto-refreshes every 30s
             </span>
             <span className="meta-divider" />
-            <span>Last updated: May 22, 2025 10:24:30 PM UTC</span>
+            <span>Last updated: {lastUpdated}</span>
             <ApiLiveBadge />
           </div>
         </div>
@@ -305,7 +350,13 @@ function StatusPage() {
       <section className="kpi-grid">
         <KpiCard icon={Gauge} label="Overall uptime (90d)" value="99.982%" hint="+0.021% vs previous 90 days" tone="green" />
         <KpiCard icon={Clock3} label="Average latency (90d)" value="128ms" hint="-18ms vs previous 90 days" tone="purple" />
-        <KpiCard icon={AlertTriangle} label="Active incidents" value="0" hint="No active incidents" tone="yellow" />
+        <KpiCard
+          icon={AlertTriangle}
+          label="Active incidents"
+          value={String(activeIncidentsCount)}
+          hint={activeIncidentsCount === 0 ? "No active incidents" : "Incidents require attention"}
+          tone="yellow"
+        />
         <KpiCard icon={Rocket} label="Last deployment" value="May 22, 7:42 PM" hint="Deployed by ci-cd-bot" tone="blue" />
       </section>
 
@@ -332,7 +383,7 @@ function StatusPage() {
 
         <Panel className="services-panel" title="Service status" icon={Layers3}>
           <div className="services-grid">
-            {services.map((service) => (
+            {liveServices.map((service) => (
               <ServiceCard key={service.name} service={service} />
             ))}
           </div>
