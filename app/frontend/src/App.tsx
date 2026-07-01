@@ -424,6 +424,16 @@ function StatusPage() {
       ? `${monitoringSummary.api_targets_up.toFixed(0)} targets UP`
       : "Prometheus data pending";
 
+  const firingAlertsCount =
+    monitoringSummary?.firing_alerts !== undefined
+      ? monitoringSummary.firing_alerts.toFixed(0)
+      : "0";
+
+  const firingAlertsHint =
+    monitoringSummary?.firing_alerts && monitoringSummary.firing_alerts > 0
+      ? "Prometheus alerts are firing"
+      : "No Prometheus alerts firing";
+
   const lastUpdated = apiStatus?.generated_at
     ? new Date(apiStatus.generated_at).toUTCString()
     : "May 22, 2025 10:24:30 PM UTC";
@@ -515,7 +525,7 @@ function StatusPage() {
           hint={incidentHint}
           tone="yellow"
         />
-        <KpiCard icon={Rocket} label="Last deployment" value="May 22, 7:42 PM" hint="Deployed by ci-cd-bot" tone="blue" />
+        <KpiCard icon={AlertTriangle} label="Prometheus alerts" value={`${firingAlertsCount} firing`} hint={firingAlertsHint} tone="blue" />
       </section>
 
       <section className="dashboard-grid">
