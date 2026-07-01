@@ -104,3 +104,37 @@ help:
 .PHONY: doctor
 doctor:
 	./scripts/doctor.sh
+
+.PHONY: monitoring-status
+monitoring-status:
+	@echo "== Monitoring pods =="
+	@kubectl get pods -n monitoring
+	@echo
+	@echo "== Monitoring services =="
+	@kubectl get svc -n monitoring
+	@echo
+	@echo "== LocalOps ServiceMonitor =="
+	@kubectl get servicemonitor -n ops-dev
+	@echo
+	@echo "== LocalOps PrometheusRule =="
+	@kubectl get prometheusrule -n monitoring | grep localops || true
+	@echo
+	@echo "== LocalOps API Prometheus target =="
+	@curl -s --get 'http://192.168.57.10:30090/api/v1/query' --data-urlencode 'query=up{job="localops-api"}'
+
+.PHONY: monitoring-status
+monitoring-status:
+	@echo "== Monitoring pods =="
+	@kubectl get pods -n monitoring
+	@echo
+	@echo "== Monitoring services =="
+	@kubectl get svc -n monitoring
+	@echo
+	@echo "== LocalOps ServiceMonitor =="
+	@kubectl get servicemonitor -n ops-dev
+	@echo
+	@echo "== LocalOps PrometheusRule =="
+	@kubectl get prometheusrule -n monitoring | grep localops || true
+	@echo
+	@echo "== LocalOps API Prometheus target =="
+	@curl -s --get 'http://192.168.57.10:30090/api/v1/query' --data-urlencode 'query=up{job="localops-api"}'
