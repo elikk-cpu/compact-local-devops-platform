@@ -91,3 +91,11 @@ status:
 	@echo
 	@echo "== Local registry =="
 	@docker ps --filter name=localops-registry
+
+.PHONY: help
+help:
+	@echo "LocalOps commands:"
+	@echo "  make status        - show platform state"
+	@echo "  make smoke         - run health smoke test"
+	@echo "  make incident-test - simulate worker outage and restore"
+	@echo "  make release-dev   - build and push dev images"
