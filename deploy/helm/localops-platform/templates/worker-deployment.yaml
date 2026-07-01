@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localops-worker
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: localops-worker
+spec:
+  replicas: {{ .Values.worker.replicas }}
+  selector:
+    matchLabels:
+      app: localops-worker
+  template:
+    metadata:
+      labels:
+        app: localops-worker
+    spec:
+      containers:
+        - name: worker
+          image: "{{ .Values.imageRegistry }}/{{ .Values.worker.image }}:{{ .Values.worker.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.worker.port }}
+          env:
+            - name: WORKER_MODE
+              value: "kubernetes"
+            - name: WORKER_INTERVAL_SECONDS
+              value: "10"
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.worker.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.worker.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20

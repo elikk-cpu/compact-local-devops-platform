@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localops-api
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: localops-api
+spec:
+  replicas: {{ .Values.api.replicas }}
+  selector:
+    matchLabels:
+      app: localops-api
+  template:
+    metadata:
+      labels:
+        app: localops-api
+    spec:
+      containers:
+        - name: api
+          image: "{{ .Values.imageRegistry }}/{{ .Values.api.image }}:{{ .Values.api.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.api.port }}
+          env:
+            - name: APP_ENV
+              value: "kubernetes"
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.api.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.api.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20

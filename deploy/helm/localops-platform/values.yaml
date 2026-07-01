@@ -1,0 +1,27 @@
+namespace: ops-dev
+
+imageRegistry: 192.168.57.10:5000
+
+frontend:
+  image: localops-frontend
+  tag: dev
+  replicas: 2
+  port: 80
+
+api:
+  image: localops-api
+  tag: dev
+  replicas: 2
+  port: 8000
+
+worker:
+  image: localops-worker
+  tag: dev
+  replicas: 1
+  port: 9000
+
+ingress:
+  className: nginx
+  host: status.local
+  tlsSecretName: status-local-tls
+  clusterIssuer: localops-ca-issuer

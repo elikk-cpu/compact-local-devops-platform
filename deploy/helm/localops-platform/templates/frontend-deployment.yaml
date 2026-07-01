@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: localops-frontend
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: localops-frontend
+spec:
+  replicas: {{ .Values.frontend.replicas }}
+  selector:
+    matchLabels:
+      app: localops-frontend
+  template:
+    metadata:
+      labels:
+        app: localops-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: "{{ .Values.imageRegistry }}/{{ .Values.frontend.image }}:{{ .Values.frontend.tag }}"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: {{ .Values.frontend.port }}
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.frontend.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .Values.frontend.port }}
+            initialDelaySeconds: 15
+            periodSeconds: 20
