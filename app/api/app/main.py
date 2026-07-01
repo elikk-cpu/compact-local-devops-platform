@@ -6,6 +6,8 @@ from pydantic import BaseModel
 from prometheus_client import Counter, Gauge, generate_latest, CONTENT_TYPE_LATEST
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.kubernetes_status import get_kubernetes_status_safe
+
 app = FastAPI(
     title="LocalOps Status Platform API",
     version="0.1.0",
@@ -186,3 +188,7 @@ def metrics() -> Response:
         content=generate_latest(),
         media_type=CONTENT_TYPE_LATEST,
     )
+
+@app.get("/api/kubernetes/status")
+def get_real_kubernetes_status() -> dict:
+    return get_kubernetes_status_safe()
