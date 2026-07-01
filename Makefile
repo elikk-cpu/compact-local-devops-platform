@@ -68,3 +68,26 @@ smoke:
 .PHONY: incident-test
 incident-test:
 	./scripts/incident-test.sh
+
+.PHONY: status
+status:
+	@echo "== Nodes =="
+	@kubectl get nodes -o wide
+	@echo
+	@echo "== Ops-dev deployments =="
+	@kubectl get deploy -n ops-dev
+	@echo
+	@echo "== Ops-dev pods =="
+	@kubectl get pods -n ops-dev -o wide
+	@echo
+	@echo "== Services =="
+	@kubectl get svc -n ops-dev
+	@echo
+	@echo "== Ingress =="
+	@kubectl get ingress -n ops-dev
+	@echo
+	@echo "== Argo CD =="
+	@kubectl get applications -n argocd
+	@echo
+	@echo "== Local registry =="
+	@docker ps --filter name=localops-registry
