@@ -1,101 +1,238 @@
+# LocalOps Status Platform
+
 [![CI](https://github.com/elikk-cpu/compact-local-devops-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/elikk-cpu/compact-local-devops-platform/actions/workflows/ci.yml)
 
-# Compact Local DevOps Platform
+LocalOps Status Platform is a compact local DevOps platform built for practicing the full application delivery lifecycle.
 
-Production-like local DevOps platform on three Linux VMs.
+The project includes:
 
-## Project goal
-
-This project demonstrates a full self-managed DevOps platform lifecycle:
-
-build -> scan -> publish -> deploy -> observe -> alert -> investigate -> restore
-
-## Product
-
-LocalOps Status Platform is a small B2B-style status platform with:
-
-- public status page
-- admin UI
-- backend API
-- PostgreSQL
-- worker/notifier
-- GitOps delivery
-- monitoring
-- logging
-- alerts
-- backup/restore
-- runbooks
-- postmortems
-
-## Current infrastructure status
-
-Completed:
-
-- VMware lab network
-- 3 Ubuntu Server VMs
-- kubeadm Kubernetes cluster
-- containerd runtime
-- Calico CNI
-- Helm
-- Ingress-NGINX
-- cert-manager with private PKI
-- HTTPS for local domains
-- Argo CD exposed through HTTPS
-- first GitOps-managed placeholder app
-
-## VM topology
-
-| Node | Role | IP |
-|---|---|---|
-| localops-cp-1 | Kubernetes control-plane | 192.168.57.10 |
-| localops-app-1 | Worker node for application workloads | 192.168.57.11 |
-| localops-data-1 | Worker node for data/stateful workloads | 192.168.57.12 |
-
-## Repositories
-
-Main repository:
-
-- application code
-- Dockerfiles
-- Docker Compose
+- React/Vite frontend
+- FastAPI backend
+- Python worker service
+- Docker and Docker Compose
+- local Docker registry
+- Kubernetes deployment
 - Helm chart
-- Ansible
-- documentation
-- GitHub Actions
+- Argo CD GitOps delivery
+- Ingress-NGINX
+- cert-manager TLS
+- GitHub Actions CI
+- operational documentation
 
-GitOps repository:
+## Current status
 
-- Argo CD Applications
-- environment desired state
-- cluster deployment state
+The application is deployed to a local Kubernetes cluster through Argo CD.
 
-## Local URLs
+```text
+Argo CD Application: localops-platform
+Namespace:           ops-dev
+Frontend:            localops-frontend
+API:                 localops-api
+Worker:              localops-worker
+```
 
-- https://status.local:30443
-- https://argocd.status.local:30443
+## External URLs
+
+```text
+https://status.local:30443
+https://status.local:30443/admin
+https://argocd.status.local:30443
+```
+
+## Architecture
+
+```text
+Browser
+  |
+  | HTTPS status.local:30443
+  v
+Ingress-NGINX
+  |
+  +--> localops-frontend Service
+  |       |
+  |       v
+  |   React frontend pods
+  |
+  +--> localops-api Service
+          |
+          v
+      FastAPI backend pods
+
+localops-worker runs as a separate background deployment.
+```
 
 ## Repository structure
 
+```text
 app/
-  frontend/
-  api/
-  worker/
-  db/
+  frontend/        React/Vite frontend served by Nginx
+  api/             FastAPI backend
+  worker/          background worker service
 
 deploy/
-  compose/
-  helm/
-  bootstrap/
-
-ansible/
-  inventory/
-  playbooks/
+  compose/         Docker Compose workflow
+  helm/            Helm chart for Kubernetes
 
 docs/
-  diagrams/
-  incidents/
-  postmortems/
-  screenshots/
+  architecture.md  platform architecture
+  runbook.md       operational runbook
 
 .github/
-  workflows/
+  workflows/       GitHub Actions CI
+```
+
+## Local development
+
+### API
+
+```bash
+cd app/api
+source .venv/bin/activate
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+### Worker
+
+```bash
+cd app/worker
+source .venv/bin/activate
+uvicorn app.main:app --host 0.0.0.0 --port 9000
+```
+
+### Frontend
+
+```bash
+cd app/frontend
+npm run dev -- --host 0.0.0.0 --port 5173
+```
+
+Development URLs:
+
+```text
+http://192.168.57.10:5173
+http://192.168.57.10:5173/admin
+```
+
+## Docker Compose
+
+Production-like local container check:
+
+```bash
+cd deploy/compose
+docker compose up --build
+```
+
+Compose URLs:
+
+```text
+http://192.168.57.10:3000
+http://192.168.57.10:3000/admin
+```
+
+Stop Compose:
+
+```bash
+docker compose down
+```
+
+## Local registry
+
+The local registry runs on the control-plane node:
+
+```text
+192.168.57.10:5000
+```
+
+Images:
+
+```text
+192.168.57.10:5000/localops-api:dev
+192.168.57.10:5000/localops-worker:dev
+192.168.57.10:5000/localops-frontend:dev
+```
+
+Check registry:
+
+```bash
+curl http://127.0.0.1:5000/v2/_catalog
+```
+
+## Release workflow
+
+Build and push all dev images to the local registry:
+
+```bash
+make release-dev
+```
+
+This builds and pushes:
+
+```text
+localops-api:dev
+localops-worker:dev
+localops-frontend:dev
+```
+
+## Kubernetes and Helm
+
+Helm chart:
+
+```text
+deploy/helm/localops-platform
+```
+
+Manual install or upgrade:
+
+```bash
+helm upgrade --install localops-platform deploy/helm/localops-platform \
+  -n ops-dev \
+  --create-namespace
+```
+
+Check Kubernetes state:
+
+```bash
+kubectl get deploy -n ops-dev
+kubectl get pods -n ops-dev -o wide
+kubectl get ingress -n ops-dev
+kubectl get certificate -n ops-dev
+```
+
+## Argo CD GitOps
+
+Argo CD manages the application deployment from the Helm chart in this repository.
+
+Check application:
+
+```bash
+kubectl get applications -n argocd
+kubectl describe application localops-platform -n argocd | tail -n 60
+```
+
+Expected state:
+
+```text
+localops-platform   Synced   Healthy
+```
+
+## CI
+
+GitHub Actions validates:
+
+- frontend build
+- Python API compile check
+- Python worker compile check
+- Docker image build for frontend, API and worker
+
+Workflow:
+
+```text
+.github/workflows/ci.yml
+```
+
+## Documentation
+
+More details:
+
+- [Architecture](docs/architecture.md)
+- [Runbook](docs/runbook.md)
