@@ -96,6 +96,11 @@ status:
 help:
 	@echo "LocalOps commands:"
 	@echo "  make status        - show platform state"
+	@echo "  make doctor        - check local environment readiness"
 	@echo "  make smoke         - run health smoke test"
 	@echo "  make incident-test - simulate worker outage and restore"
 	@echo "  make release-dev   - build and push dev images"
+
+.PHONY: doctor
+doctor:
+	./scripts/doctor.sh
