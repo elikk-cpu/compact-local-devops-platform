@@ -269,6 +269,11 @@ type ApiMonitoringSummary = {
   api_targets_up: number;
   api_request_rate: number;
   firing_alerts: number;
+  api_availability_percent: number;
+  availability_series: Array<{
+    timestamp: number;
+    value: number;
+  }>;
   requests_by_endpoint: Array<{
     endpoint: string;
     value: number;
@@ -414,6 +419,27 @@ function StatusPage() {
       ? "No active incidents"
       : `${activeIncidentsCount} Kubernetes incident${activeIncidentsCount === 1 ? "" : "s"} detected`;
 
+  const apiAvailability =
+    monitoringSummary?.api_availability_percent !== undefined
+      ? `${monitoringSummary.api_availability_percent.toFixed(2)}%`
+      : "Pending";
+
+  const apiAvailabilityHint =
+    monitoringSummary?.api_targets_up !== undefined
+      ? `${monitoringSummary.api_targets_up.toFixed(0)} Prometheus targets monitored`
+      : "Waiting for Prometheus data";
+
+  const platformUptimeData =
+    monitoringSummary?.availability_series?.length
+      ? monitoringSummary.availability_series.map((point) => ({
+          day: new Date(point.timestamp * 1000).toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+          uptime: Number(point.value.toFixed(3)),
+        }))
+      : uptimeData;
+
   const apiRequestRate =
     monitoringSummary?.api_request_rate !== undefined
       ? `${monitoringSummary.api_request_rate.toFixed(2)} req/s`
@@ -516,7 +542,7 @@ function StatusPage() {
       </section>
 
       <section className="kpi-grid">
-        <KpiCard icon={Gauge} label="Overall uptime (90d)" value="99.982%" hint="+0.021% vs previous 90 days" tone="green" />
+        <KpiCard icon={Gauge} label="API availability" value={apiAvailability} hint={apiAvailabilityHint} tone="green" />
         <KpiCard icon={Clock3} label="API request rate" value={apiRequestRate} hint={apiTargetsUp} tone="purple" />
         <KpiCard
           icon={AlertTriangle}
@@ -529,10 +555,10 @@ function StatusPage() {
       </section>
 
       <section className="dashboard-grid">
-        <Panel className="uptime-panel" title="System uptime (90 days)" icon={Activity}>
+        <Panel className="uptime-panel" title="Platform availability" icon={Activity}>
           <div className="chart">
             <ResponsiveContainer width="100%" height={260}>
-              <AreaChart data={uptimeData}>
+              <AreaChart data={platformUptimeData}>
                 <defs>
                   <linearGradient id="uptimeGradient" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#2cff9a" stopOpacity={0.6} />

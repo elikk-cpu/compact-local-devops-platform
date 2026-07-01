@@ -231,6 +231,33 @@ def prometheus_value(result: list[dict], default: float = 0.0) -> float:
         return default
 
 
+def query_prometheus_range(query: str, minutes: int = 60, step: str = "5m") -> list[dict]:
+    import json
+    import time
+
+    end = int(time.time())
+    start = end - minutes * 60
+
+    params = urllib.parse.urlencode({
+        "query": query,
+        "start": start,
+        "end": end,
+        "step": step,
+    })
+
+    url = f"{PROMETHEUS_URL}/api/v1/query_range?{params}"
+
+    with urllib.request.urlopen(url, timeout=5) as response:
+        payload = response.read().decode("utf-8")
+
+    data = json.loads(payload)
+
+    if data.get("status") != "success":
+        return []
+
+    return data.get("data", {}).get("result", [])
+
+
 @app.get("/api/monitoring/summary")
 def get_monitoring_summary() -> dict:
     api_targets = query_prometheus('sum(up{job="localops-api"})')
@@ -242,11 +269,32 @@ def get_monitoring_summary() -> dict:
     firing_alerts = query_prometheus(
         'count(ALERTS{alertstate="firing", alertname=~"LocalOps.*"})'
     )
+    availability = query_prometheus(
+        'avg_over_time(up{job="localops-api"}[1h]) * 100'
+    )
+    availability_range = query_prometheus_range(
+        'avg(up{job="localops-api"}) * 100',
+        minutes=60,
+        step="5m",
+    )
+
+    availability_series = []
+    if availability_range:
+        for point in availability_range[0].get("values", []):
+            try:
+                availability_series.append({
+                    "timestamp": float(point[0]),
+                    "value": float(point[1]),
+                })
+            except (IndexError, TypeError, ValueError):
+                continue
 
     return {
         "api_targets_up": prometheus_value(api_targets),
         "api_request_rate": prometheus_value(request_rate),
         "firing_alerts": prometheus_value(firing_alerts),
+        "api_availability_percent": prometheus_value(availability),
+        "availability_series": availability_series,
         "requests_by_endpoint": [
             {
                 "endpoint": item.get("metric", {}).get("exported_endpoint", "unknown"),
