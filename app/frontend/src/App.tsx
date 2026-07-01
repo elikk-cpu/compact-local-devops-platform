@@ -1113,9 +1113,12 @@ function ServiceCard({ service }: { service: ServiceStatus }) {
     >
       <div className="service-top">
         <div className="service-name">
-          <Icon size={22} />
-          <h3>{service.name}</h3>
-        </div>
+            <div className={`service-icon-bubble ${service.color}`}>
+              <span className="service-icon-pulse" />
+              <Icon size={26} />
+            </div>
+            <h3>{service.name}</h3>
+          </div>
         <span className="status-badge">
           <span />
           {service.status}
