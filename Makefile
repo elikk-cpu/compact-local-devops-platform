@@ -64,3 +64,7 @@ registry-check:
 .PHONY: smoke
 smoke:
 	./scripts/smoke-test.sh
+
+.PHONY: incident-test
+incident-test:
+	./scripts/incident-test.sh
