@@ -68,8 +68,8 @@ SERVICES: List[ServiceStatus] = [
     ),
     ServiceStatus(
         name="PostgreSQL",
-        status="operational",
-        description="Database connectivity is healthy",
+        status="planned",
+        description="Database will be added in persistence phase",
     ),
     ServiceStatus(
         name="Worker / Notifier",
@@ -142,10 +142,10 @@ def get_platform_status() -> dict:
             },
             {
                 "name": "PostgreSQL",
-                "status": "operational",
-                "description": "Database connectivity is healthy",
-                "latency": "1.42ms",
-                "uptime": "99.997%",
+                "status": "planned",
+                "description": "Database will be added in persistence phase",
+                "latency": "N/A",
+                "uptime": "Not configured",
                 "last_check": generated_at,
             },
             {

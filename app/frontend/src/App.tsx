@@ -47,7 +47,7 @@ import heroSkyline from "./assets/hero-skyline.svg";
 type ServiceStatus = {
   name: string;
   icon: LucideIcon;
-  status: "Operational" | "Degraded" | "Down";
+  status: "Operational" | "Degraded" | "Down" | "Planned";
   latency: string;
   uptime: string;
   lastCheck: string;
@@ -109,11 +109,11 @@ const services: ServiceStatus[] = [
   {
     name: "PostgreSQL",
     icon: Database,
-    status: "Operational",
-    latency: "1.42ms",
-    uptime: "99.997%",
-    lastCheck: "10:24:27 PM UTC",
-    color: "blue",
+    status: "Planned",
+    latency: "N/A",
+    uptime: "Not configured",
+    lastCheck: "Database planned for persistence phase",
+    color: "amber",
   },
   {
     name: "Worker / Notifier",
@@ -340,6 +340,10 @@ function StatusPage() {
   }, []);
 
   const liveServices = services.map((service) => {
+    if (service.name === "PostgreSQL") {
+      return service;
+    }
+
     const apiService = apiStatus?.services.find((item) => item.name === service.name);
 
     const k8sService = k8sStatus?.deployments.find((item) => {

@@ -2721,3 +2721,14 @@ a {
   color: var(--muted);
   font-weight: 700;
 }
+
+.status-badge.planned {
+  color: var(--yellow);
+  background: rgba(250, 204, 21, 0.12);
+  border-color: rgba(250, 204, 21, 0.35);
+}
+
+.status-badge.planned span {
+  background: var(--yellow);
+  box-shadow: 0 0 12px var(--yellow);
+}
