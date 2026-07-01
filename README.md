@@ -1,3 +1,5 @@
+[![CI](https://github.com/elikk-cpu/compact-local-devops-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/elikk-cpu/compact-local-devops-platform/actions/workflows/ci.yml)
+
 # Compact Local DevOps Platform
 
 Production-like local DevOps platform on three Linux VMs.
