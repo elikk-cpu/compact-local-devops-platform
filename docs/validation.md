@@ -199,3 +199,72 @@ GitHub Actions CI is green
 release workflow works
 documentation exists in docs/
 ```
+
+## Live Kubernetes incident validation
+
+This scenario validates that the frontend status page receives live Kubernetes health data from the backend API and shows real incidents when a workload becomes unavailable.
+
+### Preconditions
+
+- Kubernetes cluster is running.
+- Ingress-NGINX is available through `https://status.local:30443`.
+- `localops-api`, `localops-frontend`, and `localops-worker` are deployed in the `ops-dev` namespace.
+- The frontend shows `API connected`.
+- Argo CD application `localops-platform` is `Synced` and `Healthy`.
+
+### Baseline check
+
+```bash
+kubectl get deploy -n ops-dev
+kubectl get pods -n ops-dev
+curl -s -H "Host: status.local" https://192.168.57.10:30443/api/kubernetes/status -k | grep -E "overall_status|active_incidents"
+```
+
+Expected result:
+
+- `overall_status` is `operational`.
+- `active_incidents` is empty.
+- The status page shows `All Systems Operational`.
+- `Worker / Notifier` is `Operational`.
+
+### Incident simulation
+
+Scale the worker deployment down to zero replicas:
+
+```bash
+kubectl scale deployment/localops-worker -n ops-dev --replicas=0
+```
+
+Then check the Kubernetes status API:
+
+```bash
+curl -s -H "Host: status.local" https://192.168.57.10:30443/api/kubernetes/status -k | grep -E "overall_status|active_incidents"
+```
+
+Expected result:
+
+- `overall_status` changes to `major_outage`.
+- `active_incidents` contains one or more active incidents.
+- The frontend hero section shows `Major Platform Outage`.
+- The active incidents counter is greater than `0`.
+- The `Worker / Notifier` service card shows `Down`.
+- The incidents panel shows real Kubernetes incident details.
+
+### Recovery
+
+Restore the worker deployment:
+
+```bash
+kubectl scale deployment/localops-worker -n ops-dev --replicas=2
+kubectl rollout status deployment/localops-worker -n ops-dev
+kubectl get deploy -n ops-dev
+kubectl get pods -n ops-dev
+```
+
+Expected result:
+
+- `localops-worker` returns to `2/2`.
+- The API returns `overall_status: operational`.
+- The status page returns to `All Systems Operational`.
+- The active incidents counter returns to `0`.
+- `Worker / Notifier` returns to `Operational`.
