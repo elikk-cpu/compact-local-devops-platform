@@ -92,8 +92,8 @@ const services: ServiceStatus[] = [
     name: "Public API",
     icon: Globe2,
     status: "Operational",
-    latency: "112ms",
-    uptime: "99.987%",
+    latency: "pending",
+    uptime: "Prometheus pending",
     lastCheck: "10:24:29 PM UTC",
     color: "cyan",
   },
@@ -101,8 +101,8 @@ const services: ServiceStatus[] = [
     name: "Admin UI",
     icon: Monitor,
     status: "Operational",
-    latency: "98ms",
-    uptime: "99.991%",
+    latency: "pending",
+    uptime: "Prometheus pending",
     lastCheck: "10:24:28 PM UTC",
     color: "violet",
   },
@@ -119,8 +119,8 @@ const services: ServiceStatus[] = [
     name: "Worker / Notifier",
     icon: ServerCog,
     status: "Operational",
-    latency: "164ms",
-    uptime: "99.972%",
+    latency: "pending",
+    uptime: "Prometheus pending",
     lastCheck: "10:24:30 PM UTC",
     color: "amber",
   },
@@ -128,8 +128,8 @@ const services: ServiceStatus[] = [
     name: "Ingress",
     icon: RadioTower,
     status: "Operational",
-    latency: "76ms",
-    uptime: "99.988%",
+    latency: "nginx ingress available",
+    uptime: "monitored",
     lastCheck: "10:24:29 PM UTC",
     color: "emerald",
   },
@@ -274,6 +274,11 @@ type ApiMonitoringSummary = {
     timestamp: number;
     value: number;
   }>;
+  endpoint_rate_series: Array<{
+    timestamp: number;
+    endpoint: string;
+    value: number;
+  }>;
   requests_by_endpoint: Array<{
     endpoint: string;
     value: number;
@@ -372,11 +377,22 @@ function StatusPage() {
             ? "Down"
             : null;
 
+    const desiredReplicas = k8sService?.desired_replicas ?? 0;
+    const availableReplicas = k8sService?.available_replicas ?? 0;
+
+    const readyValue = k8sService?.ready ?? service.latency;
+
+    const availabilityValue = k8sService
+      ? desiredReplicas > 0
+        ? `${Math.round((availableReplicas / desiredReplicas) * 100)}%`
+        : "0%"
+      : service.uptime;
+
     return {
       ...service,
       status: k8sNormalizedStatus ?? apiNormalizedStatus ?? service.status,
-      latency: apiService?.latency ?? service.latency,
-      uptime: apiService?.uptime ?? service.uptime,
+      latency: readyValue,
+      uptime: availabilityValue,
       lastCheck: k8sStatus?.generated_at
         ? new Date(k8sStatus.generated_at).toUTCString().replace("GMT", "UTC")
         : apiService?.last_check
@@ -440,9 +456,13 @@ function StatusPage() {
             hour: "2-digit",
             minute: "2-digit",
           }),
-          uptime: Number(point.value.toFixed(3)),
+          uptime: Math.min(100, Math.max(0, Number(point.value.toFixed(3)))),
         }))
       : uptimeData;
+
+  const platformUptimeTicks = platformUptimeData
+    .filter((_, index) => index % 5 === 0)
+    .map((point) => point.day);
 
   const apiRequestRate =
     monitoringSummary?.api_request_rate !== undefined
@@ -559,9 +579,13 @@ function StatusPage() {
       </section>
 
       <section className="dashboard-grid">
-        <Panel className="uptime-panel" title="Platform availability" icon={Activity}>
-          <div className="chart">
-            <ResponsiveContainer width="100%" height={260}>
+        <Panel className="uptime-panel" title="API target availability" icon={Activity}>
+          <div className="chart uptime-chart">
+              <div className="uptime-chart-legend">
+                <span />
+                Availability %
+              </div>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={platformUptimeData}>
                 <defs>
                   <linearGradient id="uptimeGradient" x1="0" y1="0" x2="0" y2="1">
@@ -570,12 +594,30 @@ function StatusPage() {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.12)" />
-                <XAxis dataKey="day" stroke="#8ea3b9" fontSize={12} />
-                <YAxis domain={[99.5, 100]} stroke="#8ea3b9" fontSize={12} tickFormatter={(value) => `${value}%`} />
+                <XAxis
+                    dataKey="day"
+                    ticks={platformUptimeTicks}
+                    stroke="#8ea3b9"
+                    fontSize={10}
+                    interval={0}
+                    minTickGap={8}
+                    tickMargin={8}
+                  />
+                <YAxis
+                    domain={[0, 100]}
+                    allowDataOverflow
+                    ticks={[0, 25, 50, 75, 100]}
+                    stroke="#8ea3b9"
+                    fontSize={12}
+                    tickFormatter={(value) => `${value}%`}
+                  />
                 <Tooltip contentStyle={tooltipStyle("cyan")} />
                 <Area type="monotone" dataKey="uptime" stroke="#2cff9a" strokeWidth={3} fill="url(#uptimeGradient)" dot={false} />
               </AreaChart>
             </ResponsiveContainer>
+          </div>
+          <div className="chart-footer-note">
+            Prometheus API target availability over the last 60 minutes
           </div>
         </Panel>
 
@@ -628,12 +670,8 @@ function StatusPage() {
           </div>
         </Panel>
 
-        <Panel className="latency-panel" title="Requests by endpoint" icon={Zap}>
-          <EndpointRequestsChart items={monitoringSummary?.requests_by_endpoint ?? []} />
-          <div className="legend">
-            <span className="legend-item cyan">Prometheus</span>
-            <span className="legend-item purple">Live API metrics</span>
-          </div>
+        <Panel className="latency-panel" title="API request trends" icon={Zap}>
+          <EndpointRequestsChart summary={monitoringSummary} />
         </Panel>
       </section>
     </main>
@@ -775,6 +813,9 @@ function AdminDashboard() {
                 );
               })}
             </div>
+            <div className="chart-footer-note">
+              Availability percentage from Prometheus over the last 60 minutes
+            </div>
           </Panel>
 
           <Panel className="alerts-panel" title="Incidents & alerts" icon={ShieldAlert}>
@@ -882,44 +923,97 @@ function BackgroundEffects() {
 }
 
 function EndpointRequestsChart({
-  items,
+  summary,
 }: {
-  items: ApiMonitoringSummary["requests_by_endpoint"];
+  summary: ApiMonitoringSummary | null;
 }) {
-  const sortedItems = [...items].sort((a, b) => b.value - a.value);
-  const maxValue = Math.max(...sortedItems.map((item) => item.value), 1);
+  const series = summary?.endpoint_rate_series ?? [];
 
-  if (sortedItems.length === 0) {
+  if (series.length === 0) {
     return (
       <div className="endpoint-empty">
-        Waiting for Prometheus endpoint metrics...
+        Waiting for Prometheus request trend metrics...
       </div>
     );
   }
 
-  return (
-    <div className="endpoint-requests">
-      {sortedItems.map((item) => {
-        const width = Math.max((item.value / maxValue) * 100, 4);
+  const endpoints = Array.from(
+    new Set(series.map((item) => item.endpoint))
+  ).slice(0, 5);
 
-        return (
-          <div className="endpoint-request-row" key={item.endpoint}>
-            <div className="endpoint-request-head">
-              <span>{item.endpoint}</span>
-              <strong>{Math.round(item.value)}</strong>
-            </div>
-            <div className="endpoint-request-track">
-              <div
-                className="endpoint-request-fill"
-                style={{ width: `${width}%` }}
-              />
-            </div>
-          </div>
-        );
-      })}
+  const chartMap = new Map<number, Record<string, string | number>>();
+
+  for (const item of series) {
+    const timestamp = Math.floor(item.timestamp);
+    const row =
+      chartMap.get(timestamp) ??
+      {
+        ts: timestamp,
+        time: new Date(timestamp * 1000).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      };
+
+    row[item.endpoint] = Number(item.value.toFixed(4));
+    chartMap.set(timestamp, row);
+  }
+
+  const chartData = Array.from(chartMap.values()).sort((a, b) =>
+    Number(a.ts) - Number(b.ts)
+  );
+
+  const endpointTrendTicks = chartData
+    .filter((_, index) => index % 5 === 0)
+    .map((point) => String(point.time));
+
+  const lineColors = ["#38bdf8", "#a855f7", "#f472b6", "#2cff9a", "#facc15"];
+
+  return (
+    <div className="endpoint-trend-chart">
+      <div className="endpoint-trend-toolbar">
+        <span>Last 60 minutes</span>
+        <div>
+          {endpoints.slice(0, 3).map((endpoint, index) => (
+            <span className="endpoint-trend-legend" key={endpoint}>
+              <i style={{ borderColor: lineColors[index % lineColors.length] }} />
+              {endpoint}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <ResponsiveContainer width="100%" height={320}>
+        <LineChart data={chartData}>
+          <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.12)" />
+          <XAxis
+            dataKey="time"
+            ticks={endpointTrendTicks}
+            stroke="#8ea3b9"
+            fontSize={10}
+            interval={0}
+            minTickGap={8}
+            tickMargin={8}
+          />
+          <YAxis stroke="#8ea3b9" fontSize={12} tickFormatter={(value) => `${value} r/s`} />
+          <Tooltip contentStyle={tooltipStyle("cyan")} />
+          {endpoints.map((endpoint, index) => (
+            <Line
+              key={endpoint}
+              type="monotone"
+              dataKey={endpoint}
+              stroke={lineColors[index % lineColors.length]}
+              strokeWidth={3}
+              dot={false}
+              connectNulls
+            />
+          ))}
+        </LineChart>
+      </ResponsiveContainer>
     </div>
   );
 }
+
 
 function KpiCard({
   icon: Icon,
@@ -1030,11 +1124,11 @@ function ServiceCard({ service }: { service: ServiceStatus }) {
 
       <div className="service-metrics">
         <div>
-          <p>Latency</p>
+          <p>Ready</p>
           <strong>{service.latency}</strong>
         </div>
         <div>
-          <p>Uptime (90d)</p>
+          <p>Availability</p>
           <strong>{service.uptime}</strong>
         </div>
       </div>

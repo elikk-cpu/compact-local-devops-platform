@@ -2732,3 +2732,263 @@ a {
   background: var(--yellow);
   box-shadow: 0 0 12px var(--yellow);
 }
+
+.uptime-panel .chart {
+  min-height: 340px;
+}
+
+.chart-footer-note {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Compact filled uptime panel, like the reference status card */
+.uptime-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.uptime-panel .chart,
+.uptime-panel .uptime-chart {
+  position: relative;
+  flex: 1;
+  min-height: 360px;
+  height: 360px;
+}
+
+.uptime-panel .recharts-responsive-container {
+  min-height: 360px;
+}
+
+.uptime-chart-legend {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.uptime-chart-legend span {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow: 0 0 12px var(--green);
+}
+
+.chart-footer-note {
+  margin-top: 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Premium KPI icons */
+.kpi-icon {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.28), rgba(14, 165, 233, 0.08));
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  box-shadow:
+    inset 0 0 18px rgba(56, 189, 248, 0.08),
+    0 0 28px rgba(56, 189, 248, 0.16);
+}
+
+.kpi-icon svg {
+  width: 27px;
+  height: 27px;
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+.kpi-card.green .kpi-icon {
+  background: radial-gradient(circle at 30% 20%, rgba(44, 255, 154, 0.26), rgba(44, 255, 154, 0.07));
+  border-color: rgba(44, 255, 154, 0.3);
+  box-shadow:
+    inset 0 0 18px rgba(44, 255, 154, 0.08),
+    0 0 30px rgba(44, 255, 154, 0.16);
+}
+
+.kpi-card.purple .kpi-icon {
+  background: radial-gradient(circle at 30% 20%, rgba(168, 85, 247, 0.32), rgba(168, 85, 247, 0.08));
+  border-color: rgba(168, 85, 247, 0.34);
+  box-shadow:
+    inset 0 0 18px rgba(168, 85, 247, 0.08),
+    0 0 30px rgba(168, 85, 247, 0.18);
+}
+
+.kpi-card.yellow .kpi-icon {
+  background: radial-gradient(circle at 30% 20%, rgba(250, 204, 21, 0.28), rgba(250, 204, 21, 0.08));
+  border-color: rgba(250, 204, 21, 0.34);
+  box-shadow:
+    inset 0 0 18px rgba(250, 204, 21, 0.08),
+    0 0 30px rgba(250, 204, 21, 0.16);
+}
+
+.kpi-card.blue .kpi-icon {
+  background: radial-gradient(circle at 30% 20%, rgba(14, 165, 233, 0.32), rgba(14, 165, 233, 0.08));
+  border-color: rgba(14, 165, 233, 0.34);
+  box-shadow:
+    inset 0 0 18px rgba(14, 165, 233, 0.08),
+    0 0 30px rgba(14, 165, 233, 0.18);
+}
+
+/* Premium service icons */
+.service-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.service-icon-bubble {
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  border-radius: 16px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(56, 189, 248, 0.26);
+  background: radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.24), rgba(56, 189, 248, 0.07));
+  box-shadow:
+    inset 0 0 16px rgba(56, 189, 248, 0.08),
+    0 0 24px rgba(56, 189, 248, 0.14);
+}
+
+.service-icon-bubble svg {
+  width: 23px;
+  height: 23px;
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+.service-icon-bubble.cyan {
+  color: var(--cyan);
+  border-color: rgba(56, 189, 248, 0.34);
+  background: radial-gradient(circle at 30% 20%, rgba(56, 189, 248, 0.30), rgba(56, 189, 248, 0.07));
+}
+
+.service-icon-bubble.violet {
+  color: var(--purple);
+  border-color: rgba(168, 85, 247, 0.34);
+  background: radial-gradient(circle at 30% 20%, rgba(168, 85, 247, 0.30), rgba(168, 85, 247, 0.07));
+  box-shadow:
+    inset 0 0 16px rgba(168, 85, 247, 0.08),
+    0 0 24px rgba(168, 85, 247, 0.16);
+}
+
+.service-icon-bubble.amber {
+  color: var(--yellow);
+  border-color: rgba(250, 204, 21, 0.34);
+  background: radial-gradient(circle at 30% 20%, rgba(250, 204, 21, 0.28), rgba(250, 204, 21, 0.07));
+  box-shadow:
+    inset 0 0 16px rgba(250, 204, 21, 0.08),
+    0 0 24px rgba(250, 204, 21, 0.14);
+}
+
+.service-icon-bubble.emerald {
+  color: var(--green);
+  border-color: rgba(44, 255, 154, 0.34);
+  background: radial-gradient(circle at 30% 20%, rgba(44, 255, 154, 0.24), rgba(44, 255, 154, 0.07));
+  box-shadow:
+    inset 0 0 16px rgba(44, 255, 154, 0.08),
+    0 0 24px rgba(44, 255, 154, 0.14);
+}
+
+.service-icon-bubble.blue {
+  color: var(--blue);
+  border-color: rgba(14, 165, 233, 0.34);
+  background: radial-gradient(circle at 30% 20%, rgba(14, 165, 233, 0.28), rgba(14, 165, 233, 0.07));
+  box-shadow:
+    inset 0 0 16px rgba(14, 165, 233, 0.08),
+    0 0 24px rgba(14, 165, 233, 0.16);
+}
+
+.endpoint-trend-chart {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  min-height: 350px;
+}
+
+.endpoint-trend-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 2px 4px 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.endpoint-trend-toolbar > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.endpoint-trend-legend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+
+.endpoint-trend-legend i {
+  width: 10px;
+  height: 10px;
+  border: 3px solid currentColor;
+  border-radius: 999px;
+  box-shadow: 0 0 10px currentColor;
+}
+
+/* Clean API request trend chart */
+.endpoint-trend-chart {
+  padding: 6px 4px 0;
+}
+
+.endpoint-trend-chart .recharts-wrapper,
+.endpoint-trend-chart .recharts-surface {
+  outline: none !important;
+  border: none !important;
+}
+
+.endpoint-trend-chart svg {
+  outline: none !important;
+}
+
+.endpoint-trend-chart .recharts-cartesian-grid line {
+  stroke-opacity: 0.35;
+}
+
+.endpoint-trend-chart .recharts-line-curve {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+
+.endpoint-trend-toolbar {
+  margin-bottom: 8px;
+}
+
+.endpoint-trend-toolbar > span {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.endpoint-trend-legend {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}

@@ -231,11 +231,18 @@ def prometheus_value(result: list[dict], default: float = 0.0) -> float:
         return default
 
 
-def query_prometheus_range(query: str, minutes: int = 60, step: str = "5m") -> list[dict]:
+def query_prometheus_range(query: str, minutes: int = 60, step: str = "1m") -> list[dict]:
     import json
     import time
 
-    end = int(time.time())
+    if step.endswith("m"):
+        step_seconds = int(step[:-1]) * 60
+    elif step.endswith("s"):
+        step_seconds = int(step[:-1])
+    else:
+        step_seconds = 60
+
+    end = int(time.time() // step_seconds * step_seconds)
     start = end - minutes * 60
 
     params = urllib.parse.urlencode({
@@ -270,13 +277,31 @@ def get_monitoring_summary() -> dict:
         'count(ALERTS{alertstate="firing", alertname=~"LocalOps.*"})'
     )
     availability = query_prometheus(
-        'avg_over_time(up{job="localops-api"}[1h]) * 100'
+        'avg_over_time((avg(up{job="localops-api"}) * 100)[1h:1m])'
     )
     availability_range = query_prometheus_range(
-        'avg(up{job="localops-api"}) * 100',
+        'min_over_time((avg(up{job="localops-api"}) * 100)[1m:15s])',
         minutes=60,
-        step="5m",
+        step="1m",
     )
+    endpoint_rate_range = query_prometheus_range(
+        "sum(rate(localops_api_requests_total[1m])) by (exported_endpoint)",
+        minutes=60,
+        step="1m",
+    )
+
+    endpoint_rate_series = []
+    for series in endpoint_rate_range:
+        endpoint = series.get("metric", {}).get("exported_endpoint", "unknown")
+        for point in series.get("values", []):
+            try:
+                endpoint_rate_series.append({
+                    "timestamp": float(point[0]),
+                    "endpoint": endpoint,
+                    "value": float(point[1]),
+                })
+            except (IndexError, TypeError, ValueError):
+                continue
 
     availability_series = []
     if availability_range:
@@ -295,6 +320,7 @@ def get_monitoring_summary() -> dict:
         "firing_alerts": prometheus_value(firing_alerts),
         "api_availability_percent": prometheus_value(availability),
         "availability_series": availability_series,
+        "endpoint_rate_series": endpoint_rate_series,
         "requests_by_endpoint": [
             {
                 "endpoint": item.get("metric", {}).get("exported_endpoint", "unknown"),
