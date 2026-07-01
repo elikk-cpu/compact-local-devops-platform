@@ -192,3 +192,73 @@ def metrics() -> Response:
 @app.get("/api/kubernetes/status")
 def get_real_kubernetes_status() -> dict:
     return get_kubernetes_status_safe()
+
+import os
+import urllib.parse
+import urllib.request
+
+
+PROMETHEUS_URL = os.getenv(
+    "PROMETHEUS_URL",
+    "http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090",
+)
+
+
+def query_prometheus(query: str) -> list[dict]:
+    REQUEST_COUNTER.labels(endpoint="/api/monitoring/summary").inc()
+
+    url = f"{PROMETHEUS_URL}/api/v1/query?{urllib.parse.urlencode({'query': query})}"
+
+    with urllib.request.urlopen(url, timeout=5) as response:
+        payload = response.read().decode("utf-8")
+
+    import json
+    data = json.loads(payload)
+
+    if data.get("status") != "success":
+        return []
+
+    return data.get("data", {}).get("result", [])
+
+
+def prometheus_value(result: list[dict], default: float = 0.0) -> float:
+    if not result:
+        return default
+
+    try:
+        return float(result[0]["value"][1])
+    except (KeyError, IndexError, TypeError, ValueError):
+        return default
+
+
+@app.get("/api/monitoring/summary")
+def get_monitoring_summary() -> dict:
+    api_targets = query_prometheus('sum(up{job="localops-api"})')
+    request_rate = query_prometheus("sum(rate(localops_api_requests_total[1m]))")
+    requests_by_endpoint = query_prometheus(
+        "sum(localops_api_requests_total) by (exported_endpoint)"
+    )
+    service_health = query_prometheus("max(localops_service_health) by (service)")
+    firing_alerts = query_prometheus(
+        'count(ALERTS{alertstate="firing", alertname=~"LocalOps.*"})'
+    )
+
+    return {
+        "api_targets_up": prometheus_value(api_targets),
+        "api_request_rate": prometheus_value(request_rate),
+        "firing_alerts": prometheus_value(firing_alerts),
+        "requests_by_endpoint": [
+            {
+                "endpoint": item.get("metric", {}).get("exported_endpoint", "unknown"),
+                "value": float(item.get("value", [0, "0"])[1]),
+            }
+            for item in requests_by_endpoint
+        ],
+        "service_health": [
+            {
+                "service": item.get("metric", {}).get("service", "unknown"),
+                "value": float(item.get("value", [0, "0"])[1]),
+            }
+            for item in service_health
+        ],
+    }

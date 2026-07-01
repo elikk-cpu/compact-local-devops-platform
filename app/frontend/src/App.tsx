@@ -277,9 +277,24 @@ function App() {
   return isAdmin ? <AdminDashboard /> : <StatusPage />;
 }
 
+type ApiMonitoringSummary = {
+  api_targets_up: number;
+  api_request_rate: number;
+  firing_alerts: number;
+  requests_by_endpoint: Array<{
+    endpoint: string;
+    value: number;
+  }>;
+  service_health: Array<{
+    service: string;
+    value: number;
+  }>;
+};
+
 function StatusPage() {
   const [apiStatus, setApiStatus] = useState<ApiPlatformStatus | null>(null);
   const [k8sStatus, setK8sStatus] = useState<ApiKubernetesStatus | null>(null);
+  const [monitoringSummary, setMonitoringSummary] = useState<ApiMonitoringSummary | null>(null);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/status`)
@@ -308,6 +323,25 @@ function StatusPage() {
 
     loadKubernetesStatus();
     const intervalId = window.setInterval(loadKubernetesStatus, 10000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => {
+    const loadMonitoringSummary = () => {
+      fetch(`${API_BASE_URL}/api/monitoring/summary`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to load monitoring summary");
+          }
+          return response.json();
+        })
+        .then((data: ApiMonitoringSummary) => setMonitoringSummary(data))
+        .catch(() => setMonitoringSummary(null));
+    };
+
+    loadMonitoringSummary();
+    const intervalId = window.setInterval(loadMonitoringSummary, 10000);
 
     return () => window.clearInterval(intervalId);
   }, []);
@@ -392,6 +426,16 @@ function StatusPage() {
       ? "No active incidents"
       : `${activeIncidentsCount} Kubernetes incident${activeIncidentsCount === 1 ? "" : "s"} detected`;
 
+  const apiRequestRate =
+    monitoringSummary?.api_request_rate !== undefined
+      ? `${monitoringSummary.api_request_rate.toFixed(2)} req/s`
+      : "0.00 req/s";
+
+  const apiTargetsUp =
+    monitoringSummary?.api_targets_up !== undefined
+      ? `${monitoringSummary.api_targets_up.toFixed(0)} targets UP`
+      : "Prometheus data pending";
+
   const lastUpdated = apiStatus?.generated_at
     ? new Date(apiStatus.generated_at).toUTCString()
     : "May 22, 2025 10:24:30 PM UTC";
@@ -475,7 +519,7 @@ function StatusPage() {
 
       <section className="kpi-grid">
         <KpiCard icon={Gauge} label="Overall uptime (90d)" value="99.982%" hint="+0.021% vs previous 90 days" tone="green" />
-        <KpiCard icon={Clock3} label="Average latency (90d)" value="128ms" hint="-18ms vs previous 90 days" tone="purple" />
+        <KpiCard icon={Clock3} label="API request rate" value={apiRequestRate} hint={apiTargetsUp} tone="purple" />
         <KpiCard
           icon={AlertTriangle}
           label="Active incidents"
