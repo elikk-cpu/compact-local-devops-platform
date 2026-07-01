@@ -1,4 +1,7 @@
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  type ReactNode } from "react";
 import {
   Activity,
   AlertTriangle,
@@ -25,15 +28,15 @@ import {
   TerminalSquare,
   Users,
   Zap,
-} from "lucide-react";
+  } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { motion } from "motion/react";
 import {
   Area,
   AreaChart,
-  CartesianGrid,
-  Line,
   LineChart,
+  Line,
+  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -74,21 +77,6 @@ const uptimeData = [
   { day: "May 10", uptime: 99.98 },
   { day: "May 17", uptime: 99.91 },
   { day: "May 22", uptime: 99.982 },
-];
-
-const latencyData = [
-  { day: "Feb 22", p50: 118, p95: 310, p99: 520 },
-  { day: "Mar 1", p50: 122, p95: 330, p99: 540 },
-  { day: "Mar 8", p50: 111, p95: 296, p99: 505 },
-  { day: "Mar 15", p50: 132, p95: 350, p99: 570 },
-  { day: "Mar 22", p50: 126, p95: 315, p99: 522 },
-  { day: "Apr 5", p50: 168, p95: 410, p99: 760 },
-  { day: "Apr 12", p50: 129, p95: 320, p99: 538 },
-  { day: "Apr 19", p50: 121, p95: 305, p99: 512 },
-  { day: "May 3", p50: 138, p95: 335, p99: 548 },
-  { day: "May 10", p50: 127, p95: 316, p99: 526 },
-  { day: "May 17", p50: 176, p95: 448, p99: 790 },
-  { day: "May 22", p50: 128, p95: 328, p99: 536 },
 ];
 
 const adminMetricsData = [
@@ -600,12 +588,11 @@ function StatusPage() {
           </div>
         </Panel>
 
-        <Panel className="latency-panel" title="Response time trends (90 days)" icon={Zap}>
-          <ResponseChart />
+        <Panel className="latency-panel" title="Requests by endpoint" icon={Zap}>
+          <EndpointRequestsChart items={monitoringSummary?.requests_by_endpoint ?? []} />
           <div className="legend">
-            <span className="legend-item cyan">p50</span>
-            <span className="legend-item purple">p95</span>
-            <span className="legend-item pink">p99</span>
+            <span className="legend-item cyan">Prometheus</span>
+            <span className="legend-item purple">Live API metrics</span>
           </div>
         </Panel>
       </section>
@@ -854,20 +841,42 @@ function BackgroundEffects() {
   );
 }
 
-function ResponseChart() {
+function EndpointRequestsChart({
+  items,
+}: {
+  items: ApiMonitoringSummary["requests_by_endpoint"];
+}) {
+  const sortedItems = [...items].sort((a, b) => b.value - a.value);
+  const maxValue = Math.max(...sortedItems.map((item) => item.value), 1);
+
+  if (sortedItems.length === 0) {
+    return (
+      <div className="endpoint-empty">
+        Waiting for Prometheus endpoint metrics...
+      </div>
+    );
+  }
+
   return (
-    <div className="chart">
-      <ResponsiveContainer width="100%" height={260}>
-        <LineChart data={latencyData}>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(148, 163, 184, 0.12)" />
-          <XAxis dataKey="day" stroke="#8ea3b9" fontSize={12} />
-          <YAxis stroke="#8ea3b9" fontSize={12} />
-          <Tooltip contentStyle={tooltipStyle("purple")} />
-          <Line type="monotone" dataKey="p50" stroke="#38bdf8" strokeWidth={3} dot={false} />
-          <Line type="monotone" dataKey="p95" stroke="#a855f7" strokeWidth={3} dot={false} />
-          <Line type="monotone" dataKey="p99" stroke="#f472b6" strokeWidth={3} dot={false} />
-        </LineChart>
-      </ResponsiveContainer>
+    <div className="endpoint-requests">
+      {sortedItems.map((item) => {
+        const width = Math.max((item.value / maxValue) * 100, 4);
+
+        return (
+          <div className="endpoint-request-row" key={item.endpoint}>
+            <div className="endpoint-request-head">
+              <span>{item.endpoint}</span>
+              <strong>{Math.round(item.value)}</strong>
+            </div>
+            <div className="endpoint-request-track">
+              <div
+                className="endpoint-request-fill"
+                style={{ width: `${width}%` }}
+              />
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }
