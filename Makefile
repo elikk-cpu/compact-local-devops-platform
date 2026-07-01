@@ -31,3 +31,33 @@ compose-down:
 
 git-status:
 	git status
+
+
+# Local release workflow for Kubernetes dev environment
+REGISTRY ?= 192.168.57.10:5000
+TAG ?= dev
+FRONTEND_API_BASE_URL ?= https://status.local:30443
+
+.PHONY: release-dev build-api-image build-worker-image build-frontend-image push-dev-images registry-check
+
+release-dev: build-api-image build-worker-image build-frontend-image push-dev-images registry-check
+
+build-api-image:
+	docker build -t $(REGISTRY)/localops-api:$(TAG) app/api
+
+build-worker-image:
+	docker build -t $(REGISTRY)/localops-worker:$(TAG) app/worker
+
+build-frontend-image:
+	docker build --build-arg VITE_API_BASE_URL=$(FRONTEND_API_BASE_URL) -t $(REGISTRY)/localops-frontend:$(TAG) app/frontend
+
+push-dev-images:
+	docker push $(REGISTRY)/localops-api:$(TAG)
+	docker push $(REGISTRY)/localops-worker:$(TAG)
+	docker push $(REGISTRY)/localops-frontend:$(TAG)
+
+registry-check:
+	curl -fsS http://127.0.0.1:5000/v2/_catalog
+	curl -fsS http://127.0.0.1:5000/v2/localops-api/tags/list
+	curl -fsS http://127.0.0.1:5000/v2/localops-worker/tags/list
+	curl -fsS http://127.0.0.1:5000/v2/localops-frontend/tags/list
