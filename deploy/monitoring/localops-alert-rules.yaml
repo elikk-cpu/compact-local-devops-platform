@@ -1,0 +1,60 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: localops-alert-rules
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+    - name: localops.rules
+      rules:
+        - alert: LocalOpsApiTargetDown
+          expr: up{job="localops-api"} == 0
+          for: 15s
+          labels:
+            severity: critical
+            service: localops-api
+          annotations:
+            summary: "LocalOps API target is down"
+            description: "Prometheus cannot scrape one or more LocalOps API targets."
+
+        - alert: LocalOpsWorkerDeploymentScaledToZero
+          expr: kube_deployment_spec_replicas{namespace="ops-dev", deployment="localops-worker"} == 0
+          for: 15s
+          labels:
+            severity: warning
+            service: localops-worker
+          annotations:
+            summary: "LocalOps worker deployment is scaled to zero"
+            description: "localops-worker has 0 desired replicas. This causes the worker service to be unavailable."
+
+        - alert: LocalOpsWorkerDeploymentNotReady
+          expr: kube_deployment_status_replicas_available{namespace="ops-dev", deployment="localops-worker"} < kube_deployment_spec_replicas{namespace="ops-dev", deployment="localops-worker"}
+          for: 15s
+          labels:
+            severity: warning
+            service: localops-worker
+          annotations:
+            summary: "LocalOps worker deployment is not ready"
+            description: "Available replicas for localops-worker are lower than desired replicas."
+
+        - alert: LocalOpsApiDeploymentNotReady
+          expr: kube_deployment_status_replicas_available{namespace="ops-dev", deployment="localops-api"} < kube_deployment_spec_replicas{namespace="ops-dev", deployment="localops-api"}
+          for: 15s
+          labels:
+            severity: critical
+            service: localops-api
+          annotations:
+            summary: "LocalOps API deployment is not ready"
+            description: "Available replicas for localops-api are lower than desired replicas."
+
+        - alert: LocalOpsFrontendDeploymentNotReady
+          expr: kube_deployment_status_replicas_available{namespace="ops-dev", deployment="localops-frontend"} < kube_deployment_spec_replicas{namespace="ops-dev", deployment="localops-frontend"}
+          for: 15s
+          labels:
+            severity: warning
+            service: localops-frontend
+          annotations:
+            summary: "LocalOps frontend deployment is not ready"
+            description: "Available replicas for localops-frontend are lower than desired replicas."
