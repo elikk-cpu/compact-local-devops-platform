@@ -61,3 +61,6 @@ registry-check:
 	curl -fsS http://127.0.0.1:5000/v2/localops-api/tags/list
 	curl -fsS http://127.0.0.1:5000/v2/localops-worker/tags/list
 	curl -fsS http://127.0.0.1:5000/v2/localops-frontend/tags/list
+.PHONY: smoke
+smoke:
+	./scripts/smoke-test.sh
