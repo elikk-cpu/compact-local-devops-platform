@@ -216,6 +216,40 @@ type ApiPlatformStatus = {
   }[];
 };
 
+
+type ApiKubernetesStatus = {
+  overall_status: "operational" | "degraded" | "major_outage" | "unknown";
+  generated_at: string;
+  deployments: {
+    name: string;
+    kubernetes_name: string;
+    status: string;
+    desired_replicas: number;
+    ready_replicas: number;
+    available_replicas: number;
+    ready: string;
+  }[];
+  pods: {
+    name: string;
+    namespace: string;
+    node: string | null;
+    phase: string;
+    ready: boolean;
+    reason: string;
+    owner: string | null;
+    pod_ip: string | null;
+  }[];
+  active_incidents: {
+    id: number;
+    title: string;
+    status: string;
+    severity: string;
+    created_at: string;
+    updated_at: string;
+    details: string;
+  }[];
+};
+
 function ApiLiveBadge() {
   const [status, setStatus] = useState<"checking" | "connected" | "down">("checking");
 
@@ -245,6 +279,7 @@ function App() {
 
 function StatusPage() {
   const [apiStatus, setApiStatus] = useState<ApiPlatformStatus | null>(null);
+  const [k8sStatus, setK8sStatus] = useState<ApiKubernetesStatus | null>(null);
 
   useEffect(() => {
     fetch(`${API_BASE_URL}/api/status`)
@@ -258,30 +293,104 @@ function StatusPage() {
       .catch(() => setApiStatus(null));
   }, []);
 
+  useEffect(() => {
+    const loadKubernetesStatus = () => {
+      fetch(`${API_BASE_URL}/api/kubernetes/status`)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to load Kubernetes status");
+          }
+          return response.json();
+        })
+        .then((data: ApiKubernetesStatus) => setK8sStatus(data))
+        .catch(() => setK8sStatus(null));
+    };
+
+    loadKubernetesStatus();
+    const intervalId = window.setInterval(loadKubernetesStatus, 10000);
+
+    return () => window.clearInterval(intervalId);
+  }, []);
+
   const liveServices = services.map((service) => {
     const apiService = apiStatus?.services.find((item) => item.name === service.name);
 
-    const normalizedStatus: ServiceStatus["status"] =
+    const k8sService = k8sStatus?.deployments.find((item) => {
+      if (item.name === service.name) return true;
+      if (service.name === "Admin UI" && item.name === "Frontend UI") return true;
+      if (service.name === "Worker / Notifier" && item.kubernetes_name === "localops-worker") return true;
+      if (service.name === "Public API" && item.kubernetes_name === "localops-api") return true;
+      return false;
+    });
+
+    const k8sNormalizedStatus: ServiceStatus["status"] | null =
+      k8sService?.status === "operational"
+        ? "Operational"
+        : k8sService?.status === "degraded"
+          ? "Degraded"
+          : k8sService?.status === "down"
+            ? "Down"
+            : null;
+
+    const apiNormalizedStatus: ServiceStatus["status"] | null =
       apiService?.status === "operational"
         ? "Operational"
         : apiService?.status === "degraded"
           ? "Degraded"
           : apiService?.status === "down"
             ? "Down"
-            : service.status;
+            : null;
 
     return {
       ...service,
-      status: normalizedStatus,
+      status: k8sNormalizedStatus ?? apiNormalizedStatus ?? service.status,
       latency: apiService?.latency ?? service.latency,
       uptime: apiService?.uptime ?? service.uptime,
-      lastCheck: apiService?.last_check
-        ? new Date(apiService.last_check).toUTCString().replace("GMT", "UTC")
-        : service.lastCheck,
+      lastCheck: k8sStatus?.generated_at
+        ? new Date(k8sStatus.generated_at).toUTCString().replace("GMT", "UTC")
+        : apiService?.last_check
+          ? new Date(apiService.last_check).toUTCString().replace("GMT", "UTC")
+          : service.lastCheck,
     } satisfies ServiceStatus;
   });
 
-  const activeIncidentsCount = apiStatus?.active_incidents.length ?? 0;
+  const activeIncidents =
+    (k8sStatus?.active_incidents ?? apiStatus?.active_incidents ?? []) as Array<{
+      id?: string | number;
+      title: string;
+      details?: string;
+      severity?: string;
+      status?: string;
+      created_at?: string;
+      updated_at?: string;
+    }>;
+
+  const activeIncidentsCount = activeIncidents.length;
+
+  const effectiveOverallStatus = k8sStatus?.overall_status ?? apiStatus?.overall_status ?? "operational";
+
+  const heroTitle =
+    effectiveOverallStatus === "operational"
+      ? "All Systems Operational"
+      : effectiveOverallStatus === "degraded"
+        ? "Partial System Degradation"
+        : effectiveOverallStatus === "major_outage"
+          ? "Major Platform Outage"
+          : "Kubernetes Status Unknown";
+
+  const heroDescription =
+    effectiveOverallStatus === "operational"
+      ? "LocalOps platform is healthy and operating normally."
+      : effectiveOverallStatus === "degraded"
+        ? "One or more Kubernetes workloads require attention."
+        : effectiveOverallStatus === "major_outage"
+          ? "Critical platform components are unavailable."
+          : "Kubernetes status could not be determined.";
+
+  const incidentHint =
+    activeIncidentsCount === 0
+      ? "No active incidents"
+      : `${activeIncidentsCount} Kubernetes incident${activeIncidentsCount === 1 ? "" : "s"} detected`;
 
   const lastUpdated = apiStatus?.generated_at
     ? new Date(apiStatus.generated_at).toUTCString()
@@ -339,11 +448,11 @@ function StatusPage() {
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.55 }}
           >
-            All Systems Operational
+            {heroTitle}
           </motion.h1>
 
           <p>
-            LocalOps platform is healthy and operating normally.
+            {heroDescription}
             <br />
             Real-time status and performance for all systems and services.
           </p>
@@ -371,7 +480,7 @@ function StatusPage() {
           icon={AlertTriangle}
           label="Active incidents"
           value={String(activeIncidentsCount)}
-          hint={activeIncidentsCount === 0 ? "No active incidents" : "Incidents require attention"}
+          hint={incidentHint}
           tone="yellow"
         />
         <KpiCard icon={Rocket} label="Last deployment" value="May 22, 7:42 PM" hint="Deployed by ci-cd-bot" tone="blue" />
@@ -407,11 +516,26 @@ function StatusPage() {
         </Panel>
 
         <Panel className="incidents-panel" title="Incidents" icon={AlertTriangle}>
-          <div className="no-incidents">
-            <CheckCircle2 size={56} />
-            <h3>No active incidents</h3>
-            <p>Everything is running smoothly.</p>
-          </div>
+          {activeIncidentsCount > 0 ? (
+            <div className="active-incidents">
+              {activeIncidents.map((incident, index) => (
+                <div className="active-incident-row" key={incident.id ?? `${incident.title}-${index}`}>
+                  <span className="active-incident-dot" />
+                  <div>
+                    <strong>{incident.title}</strong>
+                    <p>{incident.details ?? incident.status ?? "Kubernetes incident is active"}</p>
+                  </div>
+                  <span>{incident.severity ?? "active"}</span>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="no-incidents">
+              <CheckCircle2 size={56} />
+              <h3>No active incidents</h3>
+              <p>Everything is running smoothly.</p>
+            </div>
+          )}
 
           <div className="resolved-list">
             <div className="section-head">

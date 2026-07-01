@@ -2544,3 +2544,74 @@ a {
   background: #fb3b71;
   box-shadow: 0 0 12px rgba(251, 59, 113, 0.85);
 }
+.status-badge.operational {
+  color: var(--green);
+}
+
+.status-badge.operational span {
+  background: var(--green);
+  box-shadow: 0 0 12px var(--green);
+}
+
+.status-badge.degraded {
+  color: var(--yellow);
+  background: rgba(250, 204, 21, 0.12);
+  border-color: rgba(250, 204, 21, 0.35);
+}
+
+.status-badge.degraded span {
+  background: var(--yellow);
+  box-shadow: 0 0 12px var(--yellow);
+}
+
+.status-badge.down {
+  color: #ff4d6d;
+  background: rgba(255, 77, 109, 0.12);
+  border-color: rgba(255, 77, 109, 0.35);
+}
+
+.status-badge.down span {
+  background: #ff4d6d;
+  box-shadow: 0 0 12px #ff4d6d;
+}
+
+.active-incidents {
+  display: grid;
+  gap: 12px;
+}
+
+.active-incident-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 16px;
+  border: 1px solid rgba(255, 77, 109, 0.32);
+  border-radius: 16px;
+  background: rgba(255, 77, 109, 0.08);
+}
+
+.active-incident-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #ff4d6d;
+  box-shadow: 0 0 14px #ff4d6d;
+}
+
+.active-incident-row strong {
+  color: #fff;
+}
+
+.active-incident-row p {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.active-incident-row > span:last-child {
+  color: #ff4d6d;
+  font-size: 12px;
+  text-transform: uppercase;
+  font-weight: 800;
+}
